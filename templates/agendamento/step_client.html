@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="/static/css/step_client.css" />
 {% endblock %}
 {% block content %}
-<section class="step">
+<section class="step step-client">
     <div class="step-icon">
         <i data-lucide="user-plus"></i>
     </div>
@@ -11,11 +11,17 @@
     <form method="post">
         {% csrf_token %}
         <div class="form-group">
-            <label for="client_name">Nome completo</label>
+            <label for="client_name">Nome e Sobrenome</label>
             <input type="text" name="client_name" id="client_name" required placeholder="Digite seu nome" />
         </div>
+        <div class="form-group checkbox-group">
+            <label class="checkbox">
+                <input type="checkbox" id="save_name_checkbox" />
+                <span>Salvar meu nome</span>
+            </label>
+        </div>
         <div class="actions">
-            <button type="submit" class="btn-primary">Finalizar agendamento</button>
+            <button type="submit" class="btn-primary">Prosseguir para pagamento</button>
         </div>
     </form>
 </section>

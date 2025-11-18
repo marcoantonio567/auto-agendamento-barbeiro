@@ -1,9 +1,30 @@
 document.addEventListener('DOMContentLoaded',()=>{
   const inp = document.getElementById('client_name');
+  const cb = document.getElementById('save_name_checkbox');
   if(inp){
-    const saved = localStorage.getItem('client_name');
-    if(saved) inp.value = saved;
-    inp.addEventListener('input',()=>localStorage.setItem('client_name',inp.value));
+    const opt = localStorage.getItem('client_name_opt_in') === '1';
+    if(cb){ cb.checked = opt; }
+    if(opt){
+      const saved = localStorage.getItem('client_name');
+      if(saved) inp.value = saved;
+    }
+    inp.addEventListener('input',()=>{
+      if(cb && cb.checked){
+        localStorage.setItem('client_name', inp.value);
+      }
+    });
+  }
+  if(cb){
+    cb.addEventListener('change',()=>{
+      if(cb.checked){
+        localStorage.setItem('client_name_opt_in','1');
+        const val = (inp && inp.value) ? inp.value : '';
+        localStorage.setItem('client_name', val);
+      }else{
+        localStorage.removeItem('client_name_opt_in');
+        localStorage.removeItem('client_name');
+      }
+    });
   }
   document.querySelectorAll('.options').forEach(container=>{
     const cards = container.querySelectorAll('label.option-card');
