@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Barbearia</title>
-    <link rel="stylesheet" href="/static/agendamento.css" />
+    <link rel="stylesheet" href="/static/css/base.css" />
+    <link rel="stylesheet" href="/static/css/components.css" />
+    <link rel="stylesheet" href="/static/css/steps.css" />
+    {% block styles %}{% endblock %}
     <link rel="stylesheet" href="https://unpkg.com/lucide@latest/font/lucide.css" />
 </head>
 <body>
@@ -21,6 +24,6 @@
     </main>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>lucide.createIcons()</script>
-    <script src="/static/agendamento.js"></script>
+    <script src="/static/js/agendamento.js"></script>
 </body>
 </html>

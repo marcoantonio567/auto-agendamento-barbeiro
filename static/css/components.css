@@ -1,0 +1,23 @@
+.form-group{display:flex;flex-direction:column;gap:8px;text-align:left;width:100%;max-width:400px}
+.form-group input{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;background:#ffffff;color:var(--text)}
+.actions{display:flex;gap:12px;justify-content:center;margin-top:16px}
+.btn-primary{padding:12px 24px;border:none;border-radius:8px;background:var(--accent);color:#05290f;font-weight:600;cursor:pointer;font-size:16px}
+.btn-primary:hover{opacity:.9}
+.empty{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:16px}
+select,input[type=text],input[type=date],input[type=time]{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;background:#ffffff;color:var(--text)}
+.hours{display:flex;flex-wrap:wrap;gap:8px}
+.hour{padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;cursor:pointer;background:#ffffff;color:var(--text)}
+.hour.selected{background:var(--accent);color:#05290f;border-color:var(--accent)}
+.hour.disabled{opacity:.5;cursor:not-allowed}
+.card{background:var(--card);border:1px solid #e5e7eb;border-radius:12px;padding:16px}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left}
+.filters{display:flex;gap:8px;margin-bottom:12px}
+@media(max-width:600px){.filters{flex-direction:column}}
+@media(max-width:600px){
+  .form-group{align-items:center;text-align:center}
+  .table th,.table td{text-align:center}
+  .hours{justify-content:center}
+  .grid{grid-template-columns:1fr}
+}
