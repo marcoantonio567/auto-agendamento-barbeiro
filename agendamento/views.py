@@ -30,7 +30,28 @@ SERVICES = [
         'description': 'Pacote completo para sair renovado do totem.',
     },
 ]
-BARBERS = ['Japa', 'João', 'Marco', 'Daniel']
+BARBERS = [
+    {
+        'key': 'Japa',
+        'name': 'Japa',
+        'photo': '/static/img/barbers/japa.svg',
+    },
+    {
+        'key': 'João',
+        'name': 'João',
+        'photo': '/static/img/barbers/joao.svg',
+    },
+    {
+        'key': 'Marco',
+        'name': 'Marco',
+        'photo': '/static/img/barbers/marco.svg',
+    },
+    {
+        'key': 'Daniel',
+        'name': 'Daniel',
+        'photo': '/static/img/barbers/daniel.svg',
+    },
+]
 
 
 def slots_for_day(dt):
@@ -171,7 +192,10 @@ def admin_list(request):
             qs = qs.filter(hour=h)
         except ValueError:
             pass
-    return render(request, 'agendamento/admin_list.html', {'items': qs, 'barbers': BARBERS})
+    return render(request, 'agendamento/admin_list.html', {
+        'items': qs,
+        'barbers': [b['key'] for b in BARBERS],
+    })
 
 
 @basic_auth_required

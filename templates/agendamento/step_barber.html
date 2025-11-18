@@ -13,8 +13,9 @@
         <div class="options">
             {% for b in barbers %}
             <label class="option-card">
-                <input type="radio" name="barber" value="{{ b }}" required />
-                <span class="option-title">{{ b }}</span>
+                <input type="radio" name="barber" value="{{ b.key }}" required />
+                <img class="option-avatar" src="{{ b.photo }}" alt="{{ b.name }}" />
+                <span class="option-title">{{ b.name }}</span>
             </label>
             {% endfor %}
         </div>
