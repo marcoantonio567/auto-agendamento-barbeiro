@@ -17,6 +17,14 @@ document.addEventListener('DOMContentLoaded',()=>{
           if(parent) parent.classList.remove('selected');
         });
         card.classList.add('selected');
+        const form = input.closest('form');
+        if(form){
+          if(typeof form.requestSubmit === 'function'){
+            form.requestSubmit();
+          }else{
+            form.submit();
+          }
+        }
       });
       if(input.checked){
         card.classList.add('selected');
