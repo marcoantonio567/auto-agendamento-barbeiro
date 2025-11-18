@@ -8,9 +8,27 @@ from .auth import basic_auth_required
 
 
 SERVICES = [
-    {'key': 'barba', 'label': 'Fazer a barba', 'price': 50},
-    {'key': 'cabelo', 'label': 'Cortar o cabelo', 'price': 50},
-    {'key': 'combo', 'label': 'Barba + cabelo', 'price': 100},
+    {
+        'key': 'barba',
+        'label': 'Fazer a barba',
+        'price': 50,
+        'icon': 'moustache',
+        'description': 'Linhas precisas e acabamento quente para realçar o rosto.',
+    },
+    {
+        'key': 'cabelo',
+        'label': 'Cortar o cabelo',
+        'price': 50,
+        'icon': 'comb',
+        'description': 'Corte clássico ou moderno com finalização profissional.',
+    },
+    {
+        'key': 'combo',
+        'label': 'Barba + cabelo',
+        'price': 100,
+        'icon': 'sparkles',
+        'description': 'Pacote completo para sair renovado do totem.',
+    },
 ]
 BARBERS = ['Japa', 'João', 'Marco', 'Daniel']
 
