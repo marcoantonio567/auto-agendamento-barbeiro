@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Barbearia</title>
+    <link rel="stylesheet" href="/static/agendamento.css" />
+    <link rel="stylesheet" href="https://unpkg.com/lucide@latest/font/lucide.css" />
+</head>
+<body>
+    <header class="topbar">
+        <h1>Barbearia</h1>
+        {% if back_url %}
+        <a href="{{ back_url }}" class="back-btn">
+            <i data-lucide="arrow-left"></i>
+        </a>
+        {% endif %}
+    </header>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>lucide.createIcons()</script>
+    <script src="/static/agendamento.js"></script>
+</body>
+</html>

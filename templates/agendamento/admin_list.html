@@ -1,0 +1,39 @@
+{% extends 'agendamento/base.html' %}
+{% block content %}
+<section>
+    <h2>Painel Administrativo</h2>
+    <form method="get" class="filters">
+        <select name="barber">
+            <option value="">Barbeiro</option>
+            {% for b in barbers %}
+            <option value="{{ b }}" {% if request.GET.barber == b %}selected{% endif %}>{{ b }}</option>
+            {% endfor %}
+        </select>
+        <input type="date" name="date" value="{{ request.GET.date }}" />
+        <input type="time" name="hour" value="{{ request.GET.hour }}" />
+        <button type="submit">Filtrar</button>
+    </form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cliente</th><th>Serviço</th><th>Barbeiro</th><th>Data</th><th>Hora</th><th>Status</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ap in items %}
+            <tr>
+                <td>{{ ap.client_name }}</td>
+                <td>{{ ap.service_label }}</td>
+                <td>{{ ap.barber }}</td>
+                <td>{{ ap.date|date:'d/m/Y' }}</td>
+                <td>{{ ap.hour|time:'H:i' }}</td>
+                <td>{{ ap.get_payment_status_display }}</td>
+                <td><a href="{% url 'admin_detail' ap.id %}">Detalhes</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">Nenhum agendamento</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

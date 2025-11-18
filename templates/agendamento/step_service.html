@@ -1,0 +1,24 @@
+{% extends 'agendamento/step_base.html' %}
+{% block content %}
+<section class="step">
+    <div class="step-icon">
+        <i data-lucide="scissors"></i>
+    </div>
+    <h2>Qual serviço você deseja?</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="options">
+            {% for s in services %}
+            <label class="option-card">
+                <input type="radio" name="service" value="{{ s.key }}" required />
+                <span class="option-title">{{ s.label }}</span>
+                <span class="option-price">R${{ s.price }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn-primary">Continuar</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

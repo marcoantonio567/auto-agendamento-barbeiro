@@ -1,0 +1,25 @@
+{% extends 'agendamento/step_base.html' %}
+{% block content %}
+<section class="step">
+    <div class="step-icon">
+        <i data-lucide="clock"></i>
+    </div>
+    <h2>Escolha o horário</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="options">
+            {% for h in hours %}
+            <label class="option-card">
+                <input type="radio" name="hour" value="{{ h }}" required />
+                <span class="option-title">{{ h }}</span>
+            </label>
+            {% empty %}
+            <p class="empty">Nenhum horário disponível para este dia.</p>
+            {% endfor %}
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn-primary">Continuar</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

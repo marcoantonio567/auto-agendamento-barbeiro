@@ -1,0 +1,14 @@
+{% extends 'agendamento/base.html' %}
+{% block content %}
+<section>
+    <h2>Agendamento</h2>
+    <div class="card">
+        <p><strong>Cliente:</strong> {{ ap.client_name }}</p>
+        <p><strong>Serviço:</strong> {{ ap.service_label }} - R${{ ap.price }}</p>
+        <p><strong>Barbeiro:</strong> {{ ap.barber }}</p>
+        <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} {{ ap.hour|time:'H:i' }}</p>
+        <p><strong>Status de pagamento:</strong> {{ ap.get_payment_status_display }}</p>
+    </div>
+    <p><a href="{% url 'admin_list' %}">Voltar</a></p>
+</section>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'agendamento/base.html' %}
+{% block content %}
+<section>
+    <h2>Pagamento</h2>
+    <div class="card">
+        <p><strong>Cliente:</strong> {{ ap.client_name }}</p>
+        <p><strong>Serviço:</strong> {{ ap.service_label }} - R${{ ap.price }}</p>
+        <p><strong>Barbeiro:</strong> {{ ap.barber }}</p>
+        <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} {{ ap.hour|time:'H:i' }}</p>
+        <p><strong>Status:</strong> {{ ap.get_payment_status_display }}</p>
+    </div>
+    <form method="post" action="{% url 'pagamento_confirmar' ap.id %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit">Pagar</button>
+    </form>
+    <form method="post" action="{% url 'pagamento_falhar' ap.id %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit">Simular Falha</button>
+    </form>
+    <p><a href="/">Voltar</a></p>
+</section>
+{% endblock %}
