@@ -4,7 +4,8 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from .models import Appointment
-from .auth import basic_auth_required
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 
 
 SERVICES = [
@@ -172,7 +173,7 @@ def pagamento_falhar(request, appointment_id):
     return redirect('pagamento', appointment_id=ap.id)
 
 
-@basic_auth_required
+@login_required(login_url='login')
 def admin_list(request):
     qs = Appointment.objects.all().order_by('date', 'hour', 'barber')
     barber = request.GET.get('barber')
@@ -198,7 +199,27 @@ def admin_list(request):
     })
 
 
-@basic_auth_required
+@login_required(login_url='login')
 def admin_detail(request, appointment_id):
     ap = get_object_or_404(Appointment, pk=appointment_id)
     return render(request, 'agendamento/admin_detail.html', {'ap': ap})
+
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            next_url = request.GET.get('next') or 'admin_list'
+            return redirect(next_url)
+        return render(request, 'agendamento/login.html', {'error': 'Credenciais inválidas'})
+    if request.user.is_authenticated:
+        return redirect('admin_list')
+    return render(request, 'agendamento/login.html')
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')

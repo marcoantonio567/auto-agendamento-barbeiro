@@ -121,6 +121,9 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 ADMIN_BASIC_USER = 'admin'
 ADMIN_BASIC_PASSWORD = 'admin'
 
+LOGIN_URL = '/admin/entrar/'
+LOGIN_REDIRECT_URL = '/admin/painel/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
