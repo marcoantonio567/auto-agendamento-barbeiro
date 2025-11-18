@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   document.querySelectorAll('.options').forEach(container=>{
     const cards = container.querySelectorAll('label.option-card');
+    const autoAttr = container.getAttribute('data-autosubmit');
+    const autoSubmit = autoAttr !== 'false';
     cards.forEach(card=>{
       const input = card.querySelector('input[type="radio"]');
       if(!input) return;
@@ -19,15 +21,29 @@ document.addEventListener('DOMContentLoaded',()=>{
         card.classList.add('selected');
         const form = input.closest('form');
         if(form){
-          if(typeof form.requestSubmit === 'function'){
-            form.requestSubmit();
+          if(autoSubmit){
+            if(typeof form.requestSubmit === 'function'){
+              form.requestSubmit();
+            }else{
+              form.submit();
+            }
           }else{
-            form.submit();
+            const btn = form.querySelector('button[type="submit"]');
+            if(btn){
+              btn.disabled = false;
+            }
           }
         }
       });
       if(input.checked){
         card.classList.add('selected');
+        const form = input.closest('form');
+        if(form && !autoSubmit){
+          const btn = form.querySelector('button[type="submit"]');
+          if(btn){
+            btn.disabled = false;
+          }
+        }
       }
     });
   });

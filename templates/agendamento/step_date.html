@@ -3,21 +3,30 @@
     <link rel="stylesheet" href="/static/css/step_date.css" />
 {% endblock %}
 {% block content %}
-<section class="step">
+<section class="step step-date">
     <div class="step-icon">
         <i data-lucide="calendar"></i>
     </div>
     <h2>Selecione a data</h2>
     <form method="post">
         {% csrf_token %}
-        <div class="options">
+        <div class="options" data-autosubmit="false">
             {% for d in days %}
             <label class="option-card">
                 <input type="radio" name="date" value="{{ d|date:'Y-m-d' }}" required />
-                <span class="option-title">{{ d|date:'d/m/Y' }}</span>
-                <span class="option-desc">{{ d|date:'l' }}</span>
+                <div class="option-content">
+                    <span class="option-title">
+                        {{ d|date:'l' }}
+                        {% if forloop.counter0 == 0 %}<span class="day-badge">Hoje</span>{% endif %}
+                        {% if forloop.counter0 == 1 %}<span class="day-badge">Amanhã</span>{% endif %}
+                    </span>
+                    <span class="option-desc">{{ d|date:'d/m/Y' }}</span>
+                </div>
             </label>
             {% endfor %}
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn-primary" id="confirm-date" disabled>Confirmar data</button>
         </div>
     </form>
 </section>
