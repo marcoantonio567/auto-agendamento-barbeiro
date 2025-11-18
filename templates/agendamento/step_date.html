@@ -10,7 +10,7 @@
     <h2>Selecione a data</h2>
     <form method="post">
         {% csrf_token %}
-        <div class="options" data-autosubmit="false">
+        <div class="options" data-autosubmit="true">
             {% for d in days %}
             <label class="option-card">
                 <input type="radio" name="date" value="{{ d|date:'Y-m-d' }}" required />
@@ -24,9 +24,6 @@
                 </div>
             </label>
             {% endfor %}
-        </div>
-        <div class="actions">
-            <button type="submit" class="btn-primary" id="confirm-date" disabled>Confirmar data</button>
         </div>
     </form>
 </section>
