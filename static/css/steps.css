@@ -4,8 +4,11 @@
 .option-card{display:flex;align-items:center;gap:16px;padding:16px;border:1px solid #d1d5db;border-radius:12px;background:#ffffff;cursor:pointer;position:relative;transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color .18s ease;will-change:transform}
 .option-card:hover{background:#f9fafb}
 .option-card input[type=radio]{margin:0}
-.option-icon{width:52px;height:52px;border-radius:14px;background:#e6f4ea;display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.option-icon{width:52px;height:52px;border-radius:14px;background:#e6f4ea;display:flex;align-items:center;justify-content:center;color:var(--accent);overflow:hidden}
 .option-icon i{width:28px;height:28px}
+.option-icon img{width:100%;height:100%;object-fit:cover;border-radius:14px}
+.option-icon.option-icon-combo{width:64px;height:64px}
+.option-icon.option-icon-combo img{transform:scale(1.2)}
 .option-content{display:flex;flex-direction:column;gap:4px}
 .option-title{font-weight:600}
 .option-price{margin-left:auto;color:var(--accent)}
