@@ -1,39 +1,39 @@
-:root{--bg:#0f172a;--card:#111827;--text:#f8fafc;--muted:#cbd5e1;--accent:#22c55e;--danger:#ef4444}
+:root{--bg:#f9fafb;--card:#ffffff;--text:#111827;--muted:#6b7280;--accent:#16a34a;--danger:#dc2626}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Arial}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid #1f2937}
-.back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid #374151;border-radius:8px;background:#0b1324;color:var(--text);text-decoration:none;font-size:14px}
-.back-btn:hover{background:#1f2937}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid #e5e7eb;background:var(--card)}
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;background:#ffffff;color:var(--text);text-decoration:none;font-size:14px}
+.back-btn:hover{background:#f3f4f6}
 .container{max-width:900px;margin:0 auto;padding:24px}
 h1,h2{margin:0 0 16px}
 .step{display:flex;flex-direction:column;align-items:center;text-align:center;gap:24px}
 .step-icon{width:64px;height:64px;border-radius:50%;background:var(--accent);color:#05290f;display:flex;align-items:center;justify-content:center;font-size:28px}
 .options{display:flex;flex-direction:column;gap:16px;width:100%;max-width:400px}
-.option-card{display:flex;align-items:center;gap:16px;padding:16px;border:1px solid #374151;border-radius:12px;background:#0b1324;cursor:pointer;transition:.2s}
-.option-card:hover{background:#1f2937}
+.option-card{display:flex;align-items:center;gap:16px;padding:16px;border:1px solid #d1d5db;border-radius:12px;background:#ffffff;cursor:pointer;transition:.2s}
+.option-card:hover{background:#f9fafb}
 .option-card input[type=radio]{margin:0}
-.option-icon{width:52px;height:52px;border-radius:14px;background:#13233a;display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.option-icon{width:52px;height:52px;border-radius:14px;background:#e6f4ea;display:flex;align-items:center;justify-content:center;color:var(--accent)}
 .option-icon i{width:28px;height:28px}
 .option-content{display:flex;flex-direction:column;gap:4px}
 .option-title{font-weight:600}
 .option-price{margin-left:auto;color:var(--accent)}
 .option-desc{font-size:14px;color:var(--muted)}
 .form-group{display:flex;flex-direction:column;gap:8px;text-align:left;width:100%;max-width:400px}
-.form-group input{width:100%;padding:12px;border-radius:8px;border:1px solid #374151;background:#0b1324;color:var(--text)}
+.form-group input{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;background:#ffffff;color:var(--text)}
 .actions{display:flex;gap:12px;justify-content:center;margin-top:16px}
 .btn-primary{padding:12px 24px;border:none;border-radius:8px;background:var(--accent);color:#05290f;font-weight:600;cursor:pointer;font-size:16px}
 .btn-primary:hover{opacity:.9}
 .empty{color:var(--muted)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:16px}
-select,input[type=text],input[type=date],input[type=time]{width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#0b1324;color:var(--text)}
+select,input[type=text],input[type=date],input[type=time]{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;background:#ffffff;color:var(--text)}
 .hours{display:flex;flex-wrap:wrap;gap:8px}
-.hour{padding:8px 12px;border-radius:8px;border:1px solid #374151;cursor:pointer;background:#0b1324;color:var(--text)}
+.hour{padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;cursor:pointer;background:#ffffff;color:var(--text)}
 .hour.selected{background:var(--accent);color:#05290f;border-color:var(--accent)}
 .hour.disabled{opacity:.5;cursor:not-allowed}
-.card{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:16px}
+.card{background:var(--card);border:1px solid #e5e7eb;border-radius:12px;padding:16px}
 .table{width:100%;border-collapse:collapse}
-.table th,.table td{border-bottom:1px solid #1f2937;padding:8px;text-align:left}
+.table th,.table td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left}
 .filters{display:flex;gap:8px;margin-bottom:12px}
 @media(max-width:600px){.filters{flex-direction:column}}
 input[type=radio]{display:none}
-input[type=radio]:checked+.option-card{background:#1f2937;border-color:var(--accent)}
+input[type=radio]:checked+.option-card{background:#f0fdf4;border-color:var(--accent)}
