@@ -1,4 +1,4 @@
-:root{--bg:#f9fafb;--card:#ffffff;--text:#111827;--muted:#6b7280;--accent:#16a34a;--danger:#dc2626}
+:root{--bg:#f6f8fa;--card:#ffffff;--text:#111827;--muted:#6b7280;--accent:#16a34a;--danger:#dc2626}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Arial}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid #e5e7eb;background:var(--card)}
