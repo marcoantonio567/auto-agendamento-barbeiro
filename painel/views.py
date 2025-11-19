@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from agendamento.models import Appointment
 from barbearia.helpers.infos import obter_barbers_keys
 from barbearia.helpers.fluxo import listar_agendamentos_filtrados
+from datetime import date, timedelta
 
 
 @login_required(login_url='login')
@@ -12,9 +13,15 @@ def admin_list(request):
     day = request.GET.get('date')
     hour = request.GET.get('hour')
     qs = listar_agendamentos_filtrados(barber, day, hour)
+    hours_opts = sorted({h.hour for h in qs.values_list('hour', flat=True)})
+    dates_opts = list(qs.order_by('date').values_list('date', flat=True).distinct())
     return render(request, 'painel/admin_list.html', {
         'items': qs,
         'barbers': obter_barbers_keys(),
+        'hours_options': hours_opts,
+        'dates_options': dates_opts,
+        'today': date.today(),
+        'tomorrow': date.today() + timedelta(days=1),
     })
 
 

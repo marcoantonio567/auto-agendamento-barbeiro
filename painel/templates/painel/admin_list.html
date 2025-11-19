@@ -8,37 +8,108 @@
     <h2>Painel Administrativo</h2>
     <p><a href="{% url 'logout' %}">Sair</a></p>
     <form method="get" class="filters">
-        <select name="barber">
-            <option value="">Barbeiro</option>
-            {% for b in barbers %}
-            <option value="{{ b }}" {% if request.GET.barber == b %}selected{% endif %}>{{ b }}</option>
-            {% endfor %}
-        </select>
-        <input type="date" name="date" value="{{ request.GET.date }}" />
-        <input type="time" name="hour" value="{{ request.GET.hour }}" />
-        <button type="submit">Filtrar</button>
+        <div class="filter-fields">
+            <div class="filter-field">
+                <label>Barbeiro</label>
+                <div class="input-with-icon">
+                    <i data-lucide="user"></i>
+                    <select name="barber">
+                        <option value="">Selecione</option>
+                        {% for b in barbers %}
+                        <option value="{{ b }}" {% if request.GET.barber == b %}selected{% endif %}>{{ b }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="filter-field">
+                <label>Data</label>
+                <div class="input-with-icon">
+                    <i data-lucide="calendar"></i>
+                    <select name="date">
+                        <option value="">Selecione</option>
+                        {% for d in dates_options %}
+                        {% with d_iso=d|date:'Y-m-d' %}
+                        <option value="{{ d_iso }}" {% if request.GET.date == d_iso %}selected{% endif %}>{{ d|date:'d/m/Y' }}</option>
+                        {% endwith %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="filter-field">
+                <label>Hora</label>
+                <div class="input-with-icon">
+                    <i data-lucide="clock"></i>
+                    <select name="hour">
+                        <option value="">Selecione</option>
+                        {% for h in hours_options %}
+                        <option value="{{ h }}" {% if request.GET.hour == h|stringformat:'d' %}selected{% endif %}>{{ h }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="filter-actions">
+            <button type="submit" class="apply-btn">Filtrar</button>
+            <a href="{% url 'admin_list' %}" class="clear-filters">Limpar filtros</a>
+        </div>
     </form>
+    <div class="active-filters">
+        {% if request.GET.barber %}
+            <a class="chip" href="?date={{ request.GET.date }}&hour={{ request.GET.hour }}">
+                <i data-lucide="x"></i>
+                <span>Barbeiro: {{ request.GET.barber }}</span>
+            </a>
+        {% endif %}
+        {% if request.GET.date %}
+            <a class="chip" href="?barber={{ request.GET.barber }}&hour={{ request.GET.hour }}">
+                <i data-lucide="x"></i>
+                <span>Data: {{ request.GET.date }}</span>
+            </a>
+        {% endif %}
+        {% if request.GET.hour %}
+            <a class="chip" href="?barber={{ request.GET.barber }}&date={{ request.GET.date }}">
+                <i data-lucide="x"></i>
+                <span>Hora: {{ request.GET.hour }}</span>
+            </a>
+        {% endif %}
+    </div>
     <table class="table">
         <thead>
             <tr>
-                <th>Cliente</th><th>Serviço</th><th>Barbeiro</th><th>Data</th><th>Hora</th><th>Status</th><th></th>
+                <th>Cliente</th><th>Serviço</th><th>Barbeiro</th><th>Hora</th><th>Status</th><th></th>
             </tr>
         </thead>
         <tbody>
-            {% for ap in items %}
+            {% regroup items by date as group_by_date %}
+            {% for g in group_by_date %}
+            <tr class="group-header">
+                <td colspan="6">
+                    <a class="group-date-link" href="?barber={{ request.GET.barber }}&date={{ g.grouper|date:'Y-m-d' }}&hour={{ request.GET.hour }}">{{ g.grouper|date:'d/m/Y' }}</a>
+                    {% if g.grouper == today %}
+                        <span class="day-badge">Hoje</span>
+                        <span class="weekday">{{ g.grouper|date:'l' }}</span>
+                    {% elif g.grouper == tomorrow %}
+                        <span class="day-badge">Amanhã</span>
+                        <span class="weekday">{{ g.grouper|date:'l' }}</span>
+                    {% endif %}
+                    <span class="count-badge">{{ g.list|length }} agendamento(s)</span>
+                </td>
+            </tr>
+            {% for ap in g.list %}
             <tr>
                 <td>{{ ap.client_name }}</td>
                 <td>{{ ap.service_label }}</td>
-                <td>{{ ap.barber }}</td>
-                <td>{{ ap.date|date:'d/m/Y' }}</td>
-                <td>{{ ap.hour|time:'H:i' }}</td>
+                <td><a class="filter-link" href="?barber={{ ap.barber }}&date={{ request.GET.date }}&hour={{ request.GET.hour }}">{{ ap.barber }}</a></td>
+                <td><a class="filter-link" href="?barber={{ request.GET.barber }}&date={{ request.GET.date }}&hour={{ ap.hour|time:'H' }}">{{ ap.hour|time:'H:i' }}</a></td>
                 <td>{{ ap.get_payment_status_display }}</td>
                 <td><a href="{% url 'admin_detail' ap.id %}">Detalhes</a></td>
             </tr>
+            {% endfor %}
             {% empty %}
-            <tr><td colspan="7">Nenhum agendamento</td></tr>
+            <tr><td colspan="6">Nenhum agendamento</td></tr>
             {% endfor %}
         </tbody>
     </table>
+    <script src="{% static 'painel/js/admin.js' %}"></script>
 </section>
 {% endblock %}
