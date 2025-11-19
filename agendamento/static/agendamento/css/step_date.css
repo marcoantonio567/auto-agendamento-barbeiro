@@ -1,4 +1,3 @@
-.step{}
 .step-date .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;width:100%;max-width:800px}
 .step-date .option-title{display:flex;align-items:center;gap:8px}
 .day-badge{padding:2px 8px;border-radius:999px;background:#e6f4ea;color:var(--accent);font-size:12px;font-weight:600}
