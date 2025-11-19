@@ -27,6 +27,10 @@
                     <i data-lucide="calendar"></i>
                     <select name="date">
                         <option value="">Selecione</option>
+                        {% with today_iso=today|date:'Y-m-d' tomorrow_iso=tomorrow|date:'Y-m-d' %}
+                        <option value="{{ today_iso }}" {% if request.GET.date == today_iso %}selected{% endif %}>Hoje</option>
+                        <option value="{{ tomorrow_iso }}" {% if request.GET.date == tomorrow_iso %}selected{% endif %}>Amanhã</option>
+                        {% endwith %}
                         {% for d in dates_options %}
                         {% with d_iso=d|date:'Y-m-d' %}
                         <option value="{{ d_iso }}" {% if request.GET.date == d_iso %}selected{% endif %}>{{ d|date:'d/m/Y' }}</option>
@@ -61,10 +65,12 @@
             </a>
         {% endif %}
         {% if request.GET.date %}
+            {% with today_iso=today|date:'Y-m-d' tomorrow_iso=tomorrow|date:'Y-m-d' %}
             <a class="chip" href="?barber={{ request.GET.barber }}&hour={{ request.GET.hour }}">
                 <i data-lucide="x"></i>
-                <span>Data: {{ request.GET.date }}</span>
+                <span>Data: {% if request.GET.date == today_iso %}Hoje{% elif request.GET.date == tomorrow_iso %}Amanhã{% else %}{{ request.GET.date }}{% endif %}</span>
             </a>
+            {% endwith %}
         {% endif %}
         {% if request.GET.hour %}
             <a class="chip" href="?barber={{ request.GET.barber }}&date={{ request.GET.date }}">
@@ -73,6 +79,7 @@
             </a>
         {% endif %}
     </div>
+    <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
@@ -110,6 +117,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     <script src="{% static 'painel/js/admin.js' %}"></script>
 </section>
 {% endblock %}

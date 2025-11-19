@@ -8,7 +8,8 @@
 .input-with-icon i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#6b7280}
 .input-with-icon select,.input-with-icon input{width:100%;padding:10px 12px 10px 36px;border:1px solid #e5e7eb;border-radius:8px;background:#fff}
 .filters .apply-btn{padding:8px 12px;border:1px solid #111827;background:#111827;color:#fff;border-radius:8px}
-.table{width:100%;border-collapse:collapse}
+.table-responsive{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.table{width:100%;border-collapse:collapse;min-width:640px}
 .table th,.table td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left}
 .table tbody tr:hover{background:#f9fafb}
 .group-header td{background:#f3f4f6;color:#374151;font-weight:600}
@@ -24,3 +25,8 @@
 .chip{display:flex;gap:6px;align-items:center;padding:6px 10px;border:1px solid #e5e7eb;border-radius:999px;background:#f3f4f6;color:#374151;text-decoration:none}
 .chip i{width:14px;height:14px}
 .chip:hover{background:#e5e7eb}
+@media(max-width:600px){
+  .table th,.table td{padding:6px;font-size:13px}
+  .filters .filter-actions{flex-direction:column}
+  .filters .apply-btn,.filters .clear-filters{width:100%}
+}

@@ -6,3 +6,6 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Segoe
 .back-btn:hover{background:#f3f4f6}
 .container{max-width:900px;margin:0 auto;padding:24px}
 h1,h2{margin:0 0 16px}
+@media(max-width:600px){
+  .container{padding:16px}
+}
