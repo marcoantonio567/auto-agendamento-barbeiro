@@ -1,6 +1,8 @@
 from django.shortcuts import redirect
-from django.core.signing import Signer
+from django.http import Http404
+from django.core.signing import Signer, BadSignature
 from agendamento.models import Appointment
+from django.shortcuts import get_object_or_404
 
 def criar_agendamento_e_redirecionar(request, client_name, service, barber, day, hr):
     ap = Appointment.objects.create(
@@ -23,3 +25,13 @@ def obter_dados_step_client(request):
     if not all([client_name, service, barber, date_str, hour_str]):
         return None
     return client_name, service, barber, date_str, hour_str
+
+def get_appointment_by_sid_or_404(sid):
+    """
+    Obtém um agendamento pelo sid ou retorna 404 se não encontrado.
+    """
+    try:
+        ap_id = Signer().unsign(sid)
+    except BadSignature:
+        raise Http404
+    return get_object_or_404(Appointment, pk=ap_id)
