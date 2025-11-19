@@ -1,0 +1,69 @@
+{% extends 'agendamento/base.html' %}
+{% load static %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'painel/css/admin.css' %}" />
+{% endblock %}
+{% block content %}
+<section>
+    <h2>Histórico</h2>
+    <p><a href="{% url 'logout' %}">Sair</a></p>
+    <form method="get" class="filters">
+        <div class="filter-fields">
+            <div class="filter-field">
+                <label>Barbeiro</label>
+                <div class="input-with-icon">
+                    <i data-lucide="user"></i>
+                    <select name="barber">
+                        <option value="">Selecione</option>
+                        {% for b in barbers %}
+                        <option value="{{ b }}" {% if request.GET.barber == b %}selected{% endif %}>{{ b }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="filter-field">
+                <label>De</label>
+                <div class="input-with-icon">
+                    <i data-lucide="calendar"></i>
+                    <input type="date" name="start" value="{{ request.GET.start }}" />
+                </div>
+            </div>
+            <div class="filter-field">
+                <label>Até</label>
+                <div class="input-with-icon">
+                    <i data-lucide="calendar"></i>
+                    <input type="date" name="end" value="{{ request.GET.end }}" />
+                </div>
+            </div>
+        </div>
+        <div class="filter-actions">
+            <button type="submit" class="apply-btn">Filtrar</button>
+            <a href="{% url 'admin_history' %}" class="clear-filters">Limpar filtros</a>
+        </div>
+    </form>
+    <div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cliente</th><th>Serviço</th><th>Barbeiro</th><th>Data</th><th>Hora</th><th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ap in items %}
+            <tr>
+                <td>{{ ap.client_name }}</td>
+                <td>{{ ap.service_label }}</td>
+                <td>{{ ap.barber }}</td>
+                <td>{{ ap.date|date:'d/m/Y' }}</td>
+                <td>{{ ap.hour|time:'H:i' }}</td>
+                <td>{{ ap.get_payment_status_display }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">Sem registros</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    <script src="{% static 'painel/js/admin.js' %}"></script>
+</section>
+{% endblock %}

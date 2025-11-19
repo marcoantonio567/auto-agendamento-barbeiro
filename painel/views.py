@@ -22,13 +22,52 @@ def admin_list(request):
         'dates_options': dates_opts,
         'today': date.today(),
         'tomorrow': date.today() + timedelta(days=1),
+        'is_painel': True,
     })
 
 
 @login_required(login_url='login')
 def admin_detail(request, appointment_id):
     ap = get_object_or_404(Appointment, pk=appointment_id)
-    return render(request, 'painel/admin_detail.html', {'ap': ap})
+    return render(request, 'painel/admin_detail.html', {'ap': ap, 'is_painel': True})
+
+
+@login_required(login_url='login')
+def admin_history(request):
+    barber = request.GET.get('barber')
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    qs = Appointment.objects.all()
+    if barber:
+        qs = qs.filter(barber=barber)
+    if start:
+        qs = qs.filter(date__gte=start)
+    if end:
+        qs = qs.filter(date__lte=end)
+    qs = qs.order_by('-date', '-hour')
+    return render(request, 'painel/admin_history.html', {
+        'items': qs,
+        'barbers': obter_barbers_keys(),
+        'is_painel': True,
+    })
+
+
+@login_required(login_url='login')
+def admin_finance(request):
+    all_qs = Appointment.objects.all()
+    pagos = all_qs.filter(payment_status='pago')
+    pendentes = all_qs.filter(payment_status='pendente')
+    falhos = all_qs.filter(payment_status='falhou')
+    total_pago = sum(100 if ap.service == 'combo' else 50 for ap in pagos)
+    total_pendente = sum(100 if ap.service == 'combo' else 50 for ap in pendentes)
+    total_falhou = sum(100 if ap.service == 'combo' else 50 for ap in falhos)
+    return render(request, 'painel/admin_finance.html', {
+        'pagos': pagos.order_by('-date', '-hour'),
+        'total_pago': total_pago,
+        'total_pendente': total_pendente,
+        'total_falhou': total_falhou,
+        'is_painel': True,
+    })
 
 
 def login_view(request):

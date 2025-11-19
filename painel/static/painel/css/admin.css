@@ -1,4 +1,5 @@
 .filters{display:flex;gap:16px;margin-bottom:16px;align-items:flex-end;background:var(--card);border:1px solid #e5e7eb;border-radius:12px;padding:12px}
+.filters-toggle{display:none;margin-bottom:8px;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;background:#ffffff;color:var(--text);font-size:14px}
 .filters .filter-fields{display:flex;gap:12px;flex-wrap:wrap;flex:1}
 .filters .filter-actions{display:flex;gap:8px}
 @media(max-width:600px){.filters{flex-direction:column;align-items:stretch}}
@@ -26,6 +27,7 @@
 .chip i{width:14px;height:14px}
 .chip:hover{background:#e5e7eb}
 @media(max-width:600px){
+  .filters-toggle{display:block}
   .table th,.table td{padding:6px;font-size:13px}
   .filters .filter-actions{flex-direction:column}
   .filters .apply-btn,.filters .clear-filters{width:100%}

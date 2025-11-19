@@ -1,0 +1,48 @@
+{% extends 'agendamento/base.html' %}
+{% load static %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'painel/css/admin.css' %}" />
+{% endblock %}
+{% block content %}
+<section>
+    <h2>Financeiro</h2>
+    <p><a href="{% url 'logout' %}">Sair</a></p>
+    <div class="grid">
+        <div class="card">
+            <h3>Total pago</h3>
+            <p>R${{ total_pago }}</p>
+        </div>
+        <div class="card">
+            <h3>Pendente</h3>
+            <p>R${{ total_pendente }}</p>
+        </div>
+        <div class="card">
+            <h3>Falhou</h3>
+            <p>R${{ total_falhou }}</p>
+        </div>
+    </div>
+    <div class="table-responsive" style="margin-top:16px">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Data</th><th>Cliente</th><th>Serviço</th><th>Barbeiro</th><th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ap in pagos %}
+            <tr>
+                <td>{{ ap.date|date:'d/m/Y' }} {{ ap.hour|time:'H:i' }}</td>
+                <td>{{ ap.client_name }}</td>
+                <td>{{ ap.service_label }}</td>
+                <td>{{ ap.barber }}</td>
+                <td>R${% if ap.service == 'combo' %}100{% else %}50{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">Nenhum pagamento concluído</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    <script src="{% static 'painel/js/admin.js' %}"></script>
+</section>
+{% endblock %}
