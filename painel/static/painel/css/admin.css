@@ -1,0 +1,5 @@
+.filters{display:flex;gap:8px;margin-bottom:12px}
+@media(max-width:600px){.filters{flex-direction:column}}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left}
+.card{background:var(--card);border:1px solid #e5e7eb;border-radius:12px;padding:16px}

@@ -1,6 +1,7 @@
 {% extends 'agendamento/step_base.html' %}
+{% load static %}
 {% block styles %}
-    <link rel="stylesheet" href="/static/css/step_date.css" />
+    <link rel="stylesheet" href="{% static 'agendamento/css/step_date.css' %}" />
 {% endblock %}
 {% block content %}
 <section class="step step-date">

@@ -12,7 +12,7 @@ def admin_list(request):
     day = request.GET.get('date')
     hour = request.GET.get('hour')
     qs = listar_agendamentos_filtrados(barber, day, hour)
-    return render(request, 'agendamento/admin_list.html', {
+    return render(request, 'painel/admin_list.html', {
         'items': qs,
         'barbers': obter_barbers_keys(),
     })
@@ -21,7 +21,7 @@ def admin_list(request):
 @login_required(login_url='login')
 def admin_detail(request, appointment_id):
     ap = get_object_or_404(Appointment, pk=appointment_id)
-    return render(request, 'agendamento/admin_detail.html', {'ap': ap})
+    return render(request, 'painel/admin_detail.html', {'ap': ap})
 
 
 def login_view(request):
@@ -33,10 +33,10 @@ def login_view(request):
             login(request, user)
             next_url = request.GET.get('next') or 'admin_list'
             return redirect(next_url)
-        return render(request, 'agendamento/login.html', {'error': 'Credenciais inválidas'})
+        return render(request, 'painel/login.html', {'error': 'Credenciais inválidas'})
     if request.user.is_authenticated:
         return redirect('admin_list')
-    return render(request, 'agendamento/login.html')
+    return render(request, 'painel/login.html')
 
 
 def logout_view(request):

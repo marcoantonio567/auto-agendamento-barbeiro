@@ -1,0 +1,23 @@
+{% extends 'agendamento/base.html' %}
+{% block content %}
+<section class="center-screen">
+  <div class="card auth-card">
+    <h2>Entrar</h2>
+    <form method="post" class="auth-form">
+      {% csrf_token %}
+      {% if error %}<p class="empty">{{ error }}</p>{% endif %}
+      <div class="form-group">
+        <label for="username">Usuário</label>
+        <input type="text" id="username" name="username" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" required />
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn-primary">Entrar</button>
+      </div>
+    </form>
+  </div>
+  </section>
+{% endblock %}
