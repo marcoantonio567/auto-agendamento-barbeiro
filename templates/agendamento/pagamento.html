@@ -12,11 +12,11 @@
         <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} {{ ap.hour|time:'H:i' }}</p>
         <p><strong>Status:</strong> {{ ap.get_payment_status_display }}</p>
     </div>
-    <form method="post" action="{% url 'pagamento_confirmar' ap.id %}" style="display:inline">
+    <form method="post" action="{% url 'pagamento_confirmar' sid %}" style="display:inline">
         {% csrf_token %}
         <button type="submit">Pagar</button>
     </form>
-    <form method="post" action="{% url 'pagamento_falhar' ap.id %}" style="display:inline">
+    <form method="post" action="{% url 'pagamento_falhar' sid %}" style="display:inline">
         {% csrf_token %}
         <button type="submit">Simular Falha</button>
     </form>
