@@ -1,7 +1,7 @@
 from agendamento.models import Appointment
 from .slots import slots_for_day
 from django.http import JsonResponse
-from agendamento.helpers.datas import converter_str_para_date, json_horarios_vazio
+from barbearia.helpers.datas import converter_str_para_date, json_horarios_vazio
 
 def taken_hours(barber, day):
     """Retorna um conjunto de horas já ocupadas para o barbeiro no dia."""
