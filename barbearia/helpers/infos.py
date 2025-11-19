@@ -43,3 +43,6 @@ BARBERS = [
         'photo': '/static/img/barbers/daniel.svg',
     },
 ]
+
+def obter_barbers_keys():
+    return [b['key'] for b in BARBERS]

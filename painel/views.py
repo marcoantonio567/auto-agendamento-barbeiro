@@ -1,34 +1,20 @@
-from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from agendamento.models import Appointment
-from barbearia.helpers.infos import BARBERS
+from barbearia.helpers.infos import obter_barbers_keys
+from barbearia.helpers.fluxo import listar_agendamentos_filtrados
 
 
 @login_required(login_url='login')
 def admin_list(request):
-    qs = Appointment.objects.all().order_by('date', 'hour', 'barber')
     barber = request.GET.get('barber')
     day = request.GET.get('date')
     hour = request.GET.get('hour')
-    if barber:
-        qs = qs.filter(barber=barber)
-    if day:
-        try:
-            d = datetime.strptime(day, '%Y-%m-%d').date()
-            qs = qs.filter(date=d)
-        except ValueError:
-            pass
-    if hour:
-        try:
-            h = datetime.strptime(hour, '%H:%M').time()
-            qs = qs.filter(hour=h)
-        except ValueError:
-            pass
+    qs = listar_agendamentos_filtrados(barber, day, hour)
     return render(request, 'agendamento/admin_list.html', {
         'items': qs,
-        'barbers': [b['key'] for b in BARBERS],
+        'barbers': obter_barbers_keys(),
     })
 
 
