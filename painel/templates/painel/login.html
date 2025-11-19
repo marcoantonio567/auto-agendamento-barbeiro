@@ -2,21 +2,40 @@
 {% block content %}
 <section class="center-screen">
   <div class="card auth-card">
-    <h2>Entrar</h2>
-    <form method="post" class="auth-form">
+    <h2>Entrar no painel</h2>
+    <form method="post" class="auth-form" autocomplete="on">
       {% csrf_token %}
       {% if error %}<p class="empty">{{ error }}</p>{% endif %}
       <div class="form-group">
         <label for="username">Usuário</label>
-        <input type="text" id="username" name="username" required />
+        <div class="input-with-icon">
+          <i data-lucide="user" class="input-icon"></i>
+          <input type="text" id="username" name="username" required placeholder="Digite seu usuário" autocomplete="username" />
+        </div>
       </div>
       <div class="form-group">
         <label for="password">Senha</label>
-        <input type="password" id="password" name="password" required />
+        <div class="input-with-icon">
+          <i data-lucide="lock" class="input-icon"></i>
+          <input type="password" id="password" name="password" required placeholder="Digite sua senha" autocomplete="current-password" />
+          <button type="button" class="icon-btn" id="toggle-password" aria-label="Mostrar/ocultar senha">
+            <span class="icon-swap" data-visible="false">
+              <i data-lucide="eye" class="icon-eye"></i>
+              <i data-lucide="eye-off" class="icon-eye-off"></i>
+            </span>
+          </button>
+        </div>
+      </div>
+      <div class="form-group checkbox-group">
+        <label class="checkbox">
+          <input type="checkbox" id="save_creds_checkbox" name="remember" />
+          <span>Salvar credenciais</span>
+        </label>
       </div>
       <div class="actions">
         <button type="submit" class="btn-primary">Entrar</button>
       </div>
+      <p class="muted">Use suas credenciais do painel administrativo.</p>
     </form>
   </div>
   </section>

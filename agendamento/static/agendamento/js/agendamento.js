@@ -71,4 +71,43 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
     });
   });
+  const toggleBtn = document.getElementById('toggle-password');
+  const pwdInput = document.getElementById('password');
+  if(toggleBtn && pwdInput){
+    const swap = toggleBtn.querySelector('.icon-swap');
+    toggleBtn.addEventListener('click',()=>{
+      const visible = pwdInput.type === 'text';
+      pwdInput.type = visible ? 'password' : 'text';
+      if(swap){
+        swap.setAttribute('data-visible', visible ? 'false' : 'true');
+      }
+    });
+  }
+  const adminUserInput = document.getElementById('username');
+  const saveCredsCb = document.getElementById('save_creds_checkbox');
+  if(adminUserInput){
+    const opt = localStorage.getItem('admin_username_opt_in') === '1';
+    if(saveCredsCb){ saveCredsCb.checked = opt; }
+    if(opt){
+      const saved = localStorage.getItem('admin_username');
+      if(saved) adminUserInput.value = saved;
+    }
+    adminUserInput.addEventListener('input',()=>{
+      if(saveCredsCb && saveCredsCb.checked){
+        localStorage.setItem('admin_username', adminUserInput.value);
+      }
+    });
+  }
+  if(saveCredsCb){
+    saveCredsCb.addEventListener('change',()=>{
+      if(saveCredsCb.checked){
+        localStorage.setItem('admin_username_opt_in','1');
+        const val = (adminUserInput && adminUserInput.value) ? adminUserInput.value : '';
+        localStorage.setItem('admin_username', val);
+      }else{
+        localStorage.removeItem('admin_username_opt_in');
+        localStorage.removeItem('admin_username');
+      }
+    });
+  }
 });

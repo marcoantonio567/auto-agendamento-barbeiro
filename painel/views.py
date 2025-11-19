@@ -31,6 +31,11 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            remember = request.POST.get('remember')
+            if remember == 'on':
+                request.session.set_expiry(60*60*24*30)
+            else:
+                request.session.set_expiry(0)
             next_url = request.GET.get('next') or 'admin_list'
             return redirect(next_url)
         return render(request, 'painel/login.html', {'error': 'Credenciais inválidas'})
