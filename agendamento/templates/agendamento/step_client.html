@@ -13,12 +13,22 @@
         {% csrf_token %}
         <div class="form-group">
             <label for="client_name">Nome e Sobrenome</label>
-            <input type="text" name="client_name" id="client_name" required placeholder="Digite seu nome" />
+            <div class="input-with-icon">
+                <i data-lucide="user" class="input-icon"></i>
+                <input type="text" name="client_name" id="client_name" required placeholder="Digite seu nome" autocomplete="name" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="client_phone">Telefone</label>
+            <div class="input-with-icon">
+                <i data-lucide="phone" class="input-icon"></i>
+                <input type="tel" name="client_phone" id="client_phone" required placeholder="(11) 9 1234-5678" inputmode="numeric" autocomplete="tel" maxlength="16" />
+            </div>
         </div>
         <div class="form-group checkbox-group">
             <label class="checkbox">
                 <input type="checkbox" id="save_name_checkbox" />
-                <span>Salvar meu nome</span>
+                <span>Salvar meu nome e telefone</span>
             </label>
         </div>
         <div class="actions">

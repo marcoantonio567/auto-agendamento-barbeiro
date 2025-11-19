@@ -8,6 +8,7 @@
     <h2>Agendamento</h2>
     <div class="card">
         <p><strong>Cliente:</strong> {{ ap.client_name }}</p>
+        <p><strong>Telefone:</strong> {{ ap.client_phone }}</p>
         <p><strong>Serviço:</strong> {{ ap.service_label }} - R${{ ap.price }}</p>
         <p><strong>Barbeiro:</strong> {{ ap.barber }}</p>
         <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} {{ ap.hour|time:'H:i' }}</p>

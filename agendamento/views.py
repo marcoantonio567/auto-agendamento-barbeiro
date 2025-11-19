@@ -66,13 +66,13 @@ def step_client(request):
         data = obter_dados_step_client(request)
         if not data:
             return HttpResponseBadRequest()
-        client_name, service, barber, date_str, hour_str = data
+        client_name, client_phone, service, barber, date_str, hour_str = data
         day, hr = converter_str_para_day_e_hora(date_str, hour_str)
         if not dia_e_hora_validos(day, hr):
             return HttpResponseBadRequest()
         if horario_ja_ocupado(barber, day, hr):
             return HttpResponseBadRequest()
-        return criar_agendamento_e_redirecionar(request, client_name, service, barber, day, hr)
+        return criar_agendamento_e_redirecionar(request, client_name, client_phone, service, barber, day, hr)
     return render(request, 'agendamento/step_client.html', {'back_url': 'step_hour'})
 
 

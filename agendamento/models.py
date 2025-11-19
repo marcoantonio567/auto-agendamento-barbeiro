@@ -19,6 +19,7 @@ class Appointment(models.Model):
         ('falhou', 'Falhou'),
     ]
     client_name = models.CharField(max_length=100)
+    client_phone = models.CharField(max_length=16, blank=True, default='')
     service = models.CharField(max_length=10, choices=SERVICE_CHOICES)
     barber = models.CharField(max_length=10, choices=BARBER_CHOICES)
     date = models.DateField()

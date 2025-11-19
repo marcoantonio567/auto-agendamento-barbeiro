@@ -6,9 +6,10 @@ from django.shortcuts import get_object_or_404
 from barbearia.helpers.datas import converter_str_para_date, converter_str_para_time
 from datetime import time
 
-def criar_agendamento_e_redirecionar(request, client_name, service, barber, day, hr):
+def criar_agendamento_e_redirecionar(request, client_name, client_phone, service, barber, day, hr):
     ap = Appointment.objects.create(
         client_name=client_name,
+        client_phone=client_phone,
         service=service,
         barber=barber,
         date=day,
@@ -20,13 +21,14 @@ def criar_agendamento_e_redirecionar(request, client_name, service, barber, day,
 
 def obter_dados_step_client(request):
     client_name = request.POST.get('client_name')
+    client_phone = request.POST.get('client_phone')
     service = request.session.get('service')
     barber = request.session.get('barber')
     date_str = request.session.get('date')
     hour_str = request.session.get('hour')
-    if not all([client_name, service, barber, date_str, hour_str]):
+    if not all([client_name, client_phone, service, barber, date_str, hour_str]):
         return None
-    return client_name, service, barber, date_str, hour_str
+    return client_name, client_phone, service, barber, date_str, hour_str
 
 def get_appointment_by_sid_or_404(sid):
     """

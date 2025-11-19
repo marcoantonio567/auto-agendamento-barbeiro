@@ -3,13 +3,30 @@ document.addEventListener('DOMContentLoaded',()=>{
     window.lucide.createIcons();
   }
   const inp = document.getElementById('client_name');
+  const phoneInp = document.getElementById('client_phone');
   const cb = document.getElementById('save_name_checkbox');
+  const formatBrPhone = (value)=>{
+    const digits = (value||'').replace(/\D/g,'').slice(0,11);
+    const a = digits.slice(0,2);
+    const b = digits.slice(2,3);
+    const c = digits.slice(3,7);
+    const d = digits.slice(7,11);
+    if(!a) return '';
+    if(digits.length < 2) return `(${a}`;
+    let out = `(${a}) `;
+    if(b) out += `${b} `;
+    if(c) out += c;
+    if(d) out += `-${d}`;
+    return out;
+  };
   if(inp){
     const opt = localStorage.getItem('client_name_opt_in') === '1';
     if(cb){ cb.checked = opt; }
     if(opt){
       const saved = localStorage.getItem('client_name');
       if(saved) inp.value = saved;
+      const savedPhone = localStorage.getItem('client_phone');
+      if(phoneInp && savedPhone) phoneInp.value = savedPhone;
     }
     inp.addEventListener('input',()=>{
       if(cb && cb.checked){
@@ -17,15 +34,33 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
     });
   }
+  if(phoneInp){
+    const applyMask = ()=>{
+      const masked = formatBrPhone(phoneInp.value);
+      phoneInp.value = masked;
+      if(cb && cb.checked){
+        localStorage.setItem('client_phone', masked);
+      }
+    };
+    const savedPhoneRaw = localStorage.getItem('client_phone');
+    if(cb && cb.checked && savedPhoneRaw){
+      phoneInp.value = formatBrPhone(savedPhoneRaw);
+    }
+    phoneInp.addEventListener('input', applyMask);
+    phoneInp.addEventListener('blur', applyMask);
+  }
   if(cb){
     cb.addEventListener('change',()=>{
       if(cb.checked){
         localStorage.setItem('client_name_opt_in','1');
         const val = (inp && inp.value) ? inp.value : '';
         localStorage.setItem('client_name', val);
+        const phoneVal = (phoneInp && phoneInp.value) ? phoneInp.value : '';
+        localStorage.setItem('client_phone', phoneVal);
       }else{
         localStorage.removeItem('client_name_opt_in');
         localStorage.removeItem('client_name');
+        localStorage.removeItem('client_phone');
       }
     });
   }
