@@ -6,7 +6,11 @@ from .models import Appointment
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from agendamento.helpers.infos import SERVICES, BARBERS
-from agendamento.helpers.horarios import slots_for_day, sete_dias_futuros, parse_date, available_hours_for_day
+from agendamento.helpers.slots import slots_for_day
+from agendamento.helpers.datas import sete_dias_futuros, converter_str_para_date, converter_str_para_day_e_hora
+from agendamento.helpers.disponibilidade import available_hours_for_day, horario_ja_ocupado
+from agendamento.helpers.validacao import dia_e_hora_validos
+from agendamento.helpers.fluxo import criar_agendamento_e_redirecionar, obter_dados_step_client
 
 
 def step_service(request):
@@ -53,7 +57,7 @@ def step_hour(request):
         return redirect('step_date')
     barber = request.session.get('barber')
     date_str = request.session.get('date')
-    day = parse_date(date_str)
+    day = converter_str_para_date(date_str)
     hours = available_hours_for_day(barber, day)
     if request.method == 'POST':
         request.session['hour'] = request.POST.get('hour')
@@ -68,29 +72,16 @@ def step_client(request):
     if not request.session.get('hour'):
         return redirect('step_hour')
     if request.method == 'POST':
-        client_name = request.POST.get('client_name')
-        service = request.session.get('service')
-        barber = request.session.get('barber')
-        date_str = request.session.get('date')
-        hour_str = request.session.get('hour')
-        if not all([client_name, service, barber, date_str, hour_str]):
+        data = obter_dados_step_client(request)
+        if not data:
             return HttpResponseBadRequest()
-        try:
-            day = datetime.strptime(date_str, '%Y-%m-%d').date()
-            hr = datetime.strptime(hour_str, '%H:%M').time()
-        except ValueError:
+        client_name, service, barber, date_str, hour_str = data
+        day, hr = converter_str_para_day_e_hora(date_str, hour_str)
+        if not dia_e_hora_validos(day, hr):
             return HttpResponseBadRequest()
-        today = ddate.today()
-        if day < today or day > today + timedelta(days=7):
+        if horario_ja_ocupado(barber, day, hr):
             return HttpResponseBadRequest()
-        if hr not in slots_for_day(day):
-            return HttpResponseBadRequest()
-        exists = Appointment.objects.filter(barber=barber, date=day, hour=hr).exists()
-        if exists:
-            return HttpResponseBadRequest()
-        ap = Appointment.objects.create(client_name=client_name, service=service, barber=barber, date=day, hour=hr)
-        request.session.flush()
-        return redirect('pagamento', appointment_id=ap.id)
+        return criar_agendamento_e_redirecionar(request, client_name, service, barber, day, hr)
     return render(request, 'agendamento/step_client.html', {'back_url': 'step_hour'})
 
 
@@ -173,7 +164,7 @@ def admin_detail(request, appointment_id):
     Requer usuário autenticado."""
     ap = get_object_or_404(Appointment, pk=appointment_id)
     return render(request, 'agendamento/admin_detail.html', {'ap': ap})
-''
+
 def login_view(request):
     """Tela de login e autenticação.
     - POST: autentica o usuário e redireciona para `next` (ou lista admin).
