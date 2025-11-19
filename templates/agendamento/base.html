@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/static/css/base.css" />
     <link rel="stylesheet" href="/static/css/components.css" />
     {% block styles %}{% endblock %}
+    <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="https://unpkg.com/lucide@latest/font/lucide.css" />
 </head>
 <body>
@@ -16,8 +17,7 @@
     <main class="container">
         {% block content %}{% endblock %}
     </main>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>lucide.createIcons()</script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
     <script src="/static/js/agendamento.js"></script>
 </body>
 </html>

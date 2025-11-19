@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded',()=>{
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
   const inp = document.getElementById('client_name');
   const cb = document.getElementById('save_name_checkbox');
   if(inp){
