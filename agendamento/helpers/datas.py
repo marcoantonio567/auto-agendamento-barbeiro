@@ -1,5 +1,5 @@
 from datetime import date as ddate, datetime, timedelta
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, JsonResponse
 
 def sete_dias_futuros():
     """Retorna uma lista com os próximos 8 dias a partir de hoje."""
@@ -7,11 +7,13 @@ def sete_dias_futuros():
 
 def converter_str_para_date(date_str):
     """Converte string no formato YYYY-MM-DD para date."""
-    return datetime.strptime(date_str, '%Y-%m-%d').date()
+    try:
+        return datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return None
 
-def parse_date(date_str):
-    """Atalho para converter string YYYY-MM-DD em date."""
-    return converter_str_para_date(date_str)
+def json_horarios_vazio():
+    return JsonResponse({'hours': []})
 
 def converter_str_para_time(hour_str):
     """Converte string no formato HH:MM para time."""

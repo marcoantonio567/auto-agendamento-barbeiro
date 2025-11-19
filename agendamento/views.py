@@ -6,13 +6,12 @@ from .models import Appointment
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from agendamento.helpers.infos import SERVICES, BARBERS
-from agendamento.helpers.slots import slots_for_day
-from agendamento.helpers.datas import sete_dias_futuros, converter_str_para_date, converter_str_para_day_e_hora
-from agendamento.helpers.disponibilidade import available_hours_for_day, horario_ja_ocupado
-from agendamento.helpers.validacao import dia_e_hora_validos
+from agendamento.helpers.datas import sete_dias_futuros, converter_str_para_date, converter_str_para_day_e_hora, json_horarios_vazio
+from agendamento.helpers.disponibilidade import available_hours_for_day, horario_ja_ocupado, horarios_disponiveis_response
+from agendamento.helpers.validacao import dia_e_hora_validos , verificar_step
 from agendamento.helpers.fluxo import criar_agendamento_e_redirecionar, obter_dados_step_client
 
-
+@require_http_methods(["GET","POST"])
 def step_service(request):
     """Etapa de escolha do serviço.
     - GET: exibe os serviços disponíveis.
@@ -27,8 +26,7 @@ def step_barber(request):
     Requer que um serviço já tenha sido selecionado na sessão.
     - GET: exibe os barbeiros disponíveis.
     - POST: salva o barbeiro escolhido na sessão e avança para a data."""
-    if not request.session.get('service'):
-        return redirect('step_service')
+    verificar_step(request, 'service')
     if request.method == 'POST':
         request.session['barber'] = request.POST.get('barber')
         return redirect('step_date')
@@ -39,8 +37,7 @@ def step_date(request):
     Requer que um barbeiro tenha sido selecionado.
     - GET: exibe os próximos 8 dias a partir de hoje.
     - POST: salva a data escolhida na sessão e avança para a escolha de horário."""
-    if not request.session.get('barber'):
-        return redirect('step_barber')
+    verificar_step(request, 'barber')
     if request.method == 'POST':
         request.session['date'] = request.POST.get('date')
         return redirect('step_hour')
@@ -53,8 +50,7 @@ def step_hour(request):
     (exclui horários já ocupados) e permite selecionar um.
     - GET: exibe os horários disponíveis.
     - POST: salva o horário escolhido na sessão e avança para os dados do cliente."""
-    if not request.session.get('date'):
-        return redirect('step_date')
+    verificar_step(request, 'date')
     barber = request.session.get('barber')
     date_str = request.session.get('date')
     day = converter_str_para_date(date_str)
@@ -69,8 +65,7 @@ def step_client(request):
     Valida as informações (serviço, barbeiro, data e hora), verifica se a hora
     está dentro da janela válida (hoje até 7 dias à frente) e se não está ocupada,
     cria o agendamento (Appointment), limpa a sessão e redireciona para pagamento."""
-    if not request.session.get('hour'):
-        return redirect('step_hour')
+    verificar_step(request, 'hour')
     if request.method == 'POST':
         data = obter_dados_step_client(request)
         if not data:
@@ -92,18 +87,7 @@ def horarios_api(request):
     de horários livres no formato HH:MM para o dia informado."""
     barber = request.GET.get('barber')
     date_str = request.GET.get('date')
-    if not barber or not date_str:
-        return JsonResponse({'hours': []})
-    try:
-        day = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        return JsonResponse({'hours': []})
-    taken = set(Appointment.objects.filter(barber=barber, date=day).values_list('hour', flat=True))
-    hours = []
-    for hr in slots_for_day(day):
-        if hr not in taken:
-            hours.append(hr.strftime('%H:%M'))
-    return JsonResponse({'hours': hours})
+    return horarios_disponiveis_response(barber, date_str)
 
 
 def pagamento(request, appointment_id):
