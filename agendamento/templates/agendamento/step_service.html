@@ -17,11 +17,11 @@
                 <input type="radio" name="service" value="{{ s.key }}" required />
                 <span class="option-icon option-icon-{{ s.key }}" aria-hidden="true">
                     {% if s.key == 'barba' %}
-                    <img src="{% static 'img/barba.png' %}" alt="{{ s.label }}" />
+                    <img src="{% static 'agendamento/img/barba.png' %}" alt="{{ s.label }}" />
                     {% elif s.key == 'cabelo' %}
-                    <img src="{% static 'img/cabelo.png' %}" alt="{{ s.label }}" />
+                    <img src="{% static 'agendamento/img/cabelo.png' %}" alt="{{ s.label }}" />
                     {% elif s.key == 'combo' %}
-                    <img src="{% static 'img/cabelo_e_barba.png' %}" alt="{{ s.label }}" />
+                    <img src="{% static 'agendamento/img/cabelo_e_barba.png' %}" alt="{{ s.label }}" />
                     {% endif %}
                 </span>
                 <div class="option-content">
