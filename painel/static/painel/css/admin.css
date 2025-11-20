@@ -31,4 +31,5 @@
   .table th,.table td{padding:6px;font-size:13px}
   .filters .filter-actions{flex-direction:column}
   .filters .apply-btn,.filters .clear-filters{width:100%}
+  .table{min-width:520px}
 }
