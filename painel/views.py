@@ -4,7 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from agendamento.models import Appointment
 from barbearia.helpers.infos import obter_barbers_keys
 from barbearia.helpers.fluxo import listar_agendamentos_filtrados
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
+from django.db.models import Q
 
 
 @login_required(login_url='login')
@@ -37,7 +38,9 @@ def admin_history(request):
     barber = request.GET.get('barber')
     start = request.GET.get('start')
     end = request.GET.get('end')
-    qs = Appointment.objects.all()
+    today = date.today()
+    now_time = datetime.now().time()
+    qs = Appointment.objects.filter(Q(date__lt=today) | Q(date=today, hour__lt=now_time))
     if barber:
         qs = qs.filter(barber=barber)
     if start:

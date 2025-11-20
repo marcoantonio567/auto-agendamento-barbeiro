@@ -4,7 +4,8 @@ from django.core.signing import Signer, BadSignature
 from agendamento.models import Appointment
 from django.shortcuts import get_object_or_404
 from barbearia.helpers.datas import converter_str_para_date, converter_str_para_time
-from datetime import time
+from datetime import time, date, datetime
+from django.db.models import Q
 
 def criar_agendamento_e_redirecionar(request, client_name, client_phone, service, barber, day, hr):
     ap = Appointment.objects.create(
@@ -42,6 +43,9 @@ def get_appointment_by_sid_or_404(sid):
 
 def listar_agendamentos_filtrados(barber, day_str, hour_str):
     qs = Appointment.objects.all().order_by('date', 'hour', 'barber')
+    today = date.today()
+    now_time = datetime.now().time()
+    qs = qs.filter(Q(date__gt=today) | Q(date=today, hour__gte=now_time))
     if barber:
         qs = qs.filter(barber=barber)
     if day_str:
