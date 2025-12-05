@@ -13,7 +13,78 @@
         <p><strong>Barbeiro:</strong> {{ ap.barber }}</p>
         <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} {{ ap.hour|time:'H:i' }}</p>
         <p><strong>Status de pagamento:</strong> {{ ap.get_payment_status_display }}</p>
+        <p><strong>Horário alterado:</strong> {% if ap.rescheduled %}Sim{% else %}Não{% endif %}</p>
+    </div>
+    <div class="actions">
+        <button type="button" class="btn-primary open-shift-modal">Mover horário</button>
+    </div>
+    <form id="shiftForm" method="post" style="display:none">
+        {% csrf_token %}
+    </form>
+    <div id="confirmModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <h3 id="modalTitle">Mover horário</h3>
+                <p id="modalMessage">Selecione a opção desejada.</p>
+                <div class="modal-options">
+                    <button type="button" class="btn-secondary shift-option" data-url="{% url 'admin_shift_hour' ap.id 'prev' %}" data-message="Confirmar mover para uma hora antes?">Uma hora antes</button>
+                    <button type="button" class="btn-secondary shift-option" data-url="{% url 'admin_shift_hour' ap.id 'next' %}" data-message="Confirmar mover para uma hora depois?">Uma hora depois</button>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="modalCancel">Cancelar</button>
+                    <button type="button" class="btn-primary" id="modalConfirm" disabled>Confirmar</button>
+                </div>
+            </div>
+        </div>
     </div>
     <p><a href="{% url 'admin_list' %}">Voltar</a></p>
 </section>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var modal=document.getElementById('confirmModal');
+  var modalMsg=document.getElementById('modalMessage');
+  var modalCancel=document.getElementById('modalCancel');
+  var modalConfirm=document.getElementById('modalConfirm');
+  var shiftForm=document.getElementById('shiftForm');
+  var openBtn=document.querySelector('.open-shift-modal');
+  var pendingUrl=null;
+  if(openBtn&&modal){
+    openBtn.addEventListener('click',function(){
+      modal.classList.add('show');
+      if(modalConfirm){modalConfirm.disabled=true}
+      if(modalMsg){modalMsg.textContent='Selecione a opção desejada.'}
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.shift-option'),function(opt){
+    opt.addEventListener('click',function(){
+      pendingUrl=opt.getAttribute('data-url');
+      var msg=opt.getAttribute('data-message')||'Confirmar mover?';
+      if(modalMsg){modalMsg.textContent=msg}
+      Array.prototype.forEach.call(document.querySelectorAll('.shift-option'),function(o){o.classList.remove('selected')});
+      opt.classList.add('selected');
+      if(modalConfirm){modalConfirm.disabled=false}
+    });
+  });
+  function hide(){
+    if(modal){modal.classList.remove('show')}
+    pendingUrl=null;
+    if(modalConfirm){modalConfirm.disabled=true}
+    Array.prototype.forEach.call(document.querySelectorAll('.shift-option'),function(o){o.classList.remove('selected')});
+    if(modalMsg){modalMsg.textContent='Selecione a opção desejada.'}
+  }
+  if(modalCancel){modalCancel.addEventListener('click',hide)}
+  var backdrop=modal?modal.querySelector('.modal-backdrop'):null;
+  if(backdrop){backdrop.addEventListener('click',hide)}
+  if(modalConfirm){
+    modalConfirm.addEventListener('click',function(){
+      if(shiftForm&&pendingUrl){
+        shiftForm.setAttribute('action',pendingUrl);
+        if(typeof shiftForm.requestSubmit==='function'){shiftForm.requestSubmit()}else{shiftForm.submit()}
+        hide();
+      }else{hide()}
+    });
+  }
+});
+</script>
 {% endblock %}

@@ -6,6 +6,9 @@ from barbearia.helpers.infos import obter_barbers_keys
 from barbearia.helpers.fluxo import listar_agendamentos_filtrados
 from datetime import date, timedelta, datetime
 from django.db.models import Q
+from django.contrib import messages
+from barbearia.helpers.disponibilidade import horario_ja_ocupado
+from barbearia.helpers.slots import slots_for_day
 
 
 @login_required(login_url='login')
@@ -96,3 +99,23 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+@login_required(login_url='login')
+def admin_shift_hour(request, appointment_id, direction):
+    ap = get_object_or_404(Appointment, pk=appointment_id)
+    delta = -1 if direction == 'prev' else 1
+    base_dt = datetime.combine(ap.date, ap.hour)
+    new_time = (base_dt + timedelta(hours=delta)).time()
+    valid_slots = set(slots_for_day(ap.date))
+    if new_time not in valid_slots:
+        messages.error(request, 'Horário inválido para o dia selecionado')
+        return redirect('admin_detail', appointment_id=ap.id)
+    if horario_ja_ocupado(ap.barber, ap.date, new_time):
+        messages.error(request, 'Não foi possível mover: horário já ocupado')
+        return redirect('admin_detail', appointment_id=ap.id)
+    ap.hour = new_time
+    ap.rescheduled = True
+    ap.save(update_fields=['hour', 'rescheduled'])
+    messages.success(request, 'Agendamento movido com sucesso')
+    return redirect('admin_detail', appointment_id=ap.id)

@@ -33,3 +33,12 @@
   .filters .apply-btn,.filters .clear-filters{width:100%}
   .table{min-width:520px}
 }
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1000}
+.modal.show{display:flex}
+.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.modal-dialog{position:relative;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;max-width:420px;width:90%;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.modal-content{display:flex;flex-direction:column;gap:12px}
+.modal-options{display:flex;gap:8px;flex-wrap:wrap}
+.shift-option.selected{background:#f0fdf4;border-color:var(--accent)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn-secondary{padding:12px 24px;border:1px solid #d1d5db;border-radius:8px;background:#f9fafb;color:#111827;cursor:pointer;font-weight:600}

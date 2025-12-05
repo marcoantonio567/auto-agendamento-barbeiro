@@ -25,6 +25,7 @@ class Appointment(models.Model):
     date = models.DateField()
     hour = models.TimeField()
     payment_status = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default='pendente')
+    rescheduled = models.BooleanField(default=False)
 
     class Meta:
         unique_together = [('barber', 'date', 'hour')]

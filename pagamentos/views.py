@@ -10,7 +10,7 @@ def pagamento(request, sid):
 
 
 @require_http_methods(["POST"])
-def pagamento_confirmar(sid):
+def pagamento_confirmar(request, sid):
     ap = get_appointment_by_sid_or_404(sid)
     ap.payment_status = 'pago'
     ap.save(update_fields=["payment_status"])
@@ -18,7 +18,7 @@ def pagamento_confirmar(sid):
 
 
 @require_http_methods(["POST"])
-def pagamento_falhar(sid):
+def pagamento_falhar(request, sid):
     ap = get_appointment_by_sid_or_404(sid)
     ap.payment_status = 'falhou'
     ap.save(update_fields=["payment_status"])

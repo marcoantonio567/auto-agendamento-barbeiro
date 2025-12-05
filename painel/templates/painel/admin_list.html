@@ -83,7 +83,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Cliente</th><th>Serviço</th><th>Barbeiro</th><th>Hora</th><th>Status</th><th></th>
+                <th>Cliente</th><th>Serviço</th><th>Barbeiro</th><th>Hora</th><th>Status</th><th>Alterado</th><th></th>
             </tr>
         </thead>
         <tbody>
@@ -109,6 +109,7 @@
                 <td><a class="filter-link" href="?barber={{ ap.barber }}&date={{ request.GET.date }}&hour={{ request.GET.hour }}">{{ ap.barber }}</a></td>
                 <td><a class="filter-link" href="?barber={{ request.GET.barber }}&date={{ request.GET.date }}&hour={{ ap.hour|time:'H' }}">{{ ap.hour|time:'H:i' }}</a></td>
                 <td>{{ ap.get_payment_status_display }}</td>
+                <td>{% if ap.rescheduled %}Sim{% else %}Não{% endif %}</td>
                 <td><a href="{% url 'admin_detail' ap.id %}">Detalhes</a></td>
             </tr>
             {% endfor %}
