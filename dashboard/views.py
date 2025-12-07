@@ -8,7 +8,9 @@ from datetime import date, timedelta, datetime
 from django.db.models import Q
 from django.contrib import messages
 from barbearia.helpers.disponibilidade import horario_ja_ocupado
-from barbearia.helpers.slots import slots_for_day
+from barbearia.helpers.validacao import get_hours_delta_from_direction
+from barbearia.helpers.datas import shift_hour_by_delta
+from barbearia.helpers.slots import is_valid_slot_for_day
 
 
 @login_required(login_url='login')
@@ -103,20 +105,41 @@ def logout_view(request):
 
 @login_required(login_url='login')
 def admin_shift_hour(request, appointment_id, direction):
+    """Move o horário de um agendamento em 1 hora para trás ou para frente.
+
+    - direction: 'prev' (voltar 1h) ou 'next' (avançar 1h)
+    - valida se a nova hora está nos slots do dia e se não há conflito
+    - atualiza somente os campos necessários e informa feedback ao usuário
+    """
+
+    # Recupera o agendamento pelo ID ou retorna 404 se não existir
     ap = get_object_or_404(Appointment, pk=appointment_id)
-    delta = -1 if direction == 'prev' else 1
-    base_dt = datetime.combine(ap.date, ap.hour)
-    new_time = (base_dt + timedelta(hours=delta)).time()
-    valid_slots = set(slots_for_day(ap.date))
-    if new_time not in valid_slots:
+
+    # Valida a direção informada usando helper; retorna None se inválida
+    hours_delta = get_hours_delta_from_direction(direction)
+    if hours_delta is None:
+        messages.error(request, 'Direção inválida para mover horário')
+        return redirect('admin_detail', appointment_id=ap.id)
+
+    # Calcula a nova hora somando/subtraindo 1h da hora atual do agendamento
+    new_hour = shift_hour_by_delta(ap.date, ap.hour, hours_delta)
+
+    # Bloqueia se a nova hora não faz parte dos slots válidos do dia
+    if not is_valid_slot_for_day(ap.date, new_hour):
         messages.error(request, 'Horário inválido para o dia selecionado')
         return redirect('admin_detail', appointment_id=ap.id)
-    if horario_ja_ocupado(ap.barber, ap.date, new_time):
+
+    # Bloqueia se a nova hora já está ocupada para o barbeiro
+    if horario_ja_ocupado(ap.barber, ap.date, new_hour):
         messages.error(request, 'Não foi possível mover: horário já ocupado')
         return redirect('admin_detail', appointment_id=ap.id)
-    ap.hour = new_time
+
+    # Atualiza a hora do agendamento e marca como reagendado
+    ap.hour = new_hour
     ap.rescheduled = True
+    # Salva apenas os campos modificados para eficiência
     ap.save(update_fields=['hour', 'rescheduled'])
+
+    # Informa sucesso e retorna para a página de detalhes
     messages.success(request, 'Agendamento movido com sucesso')
     return redirect('admin_detail', appointment_id=ap.id)
-

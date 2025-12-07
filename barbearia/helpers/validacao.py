@@ -18,3 +18,16 @@ def verificar_step(request, step):
     """
     if not request.session.get(step):
         return redirect(f'step_{step}')
+
+
+def get_hours_delta_from_direction(direction):
+    """Retorna o delta de horas a partir da direção.
+
+    - direction: 'prev' -> -1 hora, 'next' -> +1 hora
+    - retorna None se a direção for inválida
+    """
+    if direction == 'prev':
+        return -1
+    if direction == 'next':
+        return 1
+    return None

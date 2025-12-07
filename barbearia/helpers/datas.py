@@ -27,3 +27,14 @@ def converter_str_para_day_e_hora(date_str, hour_str):
         return day, hr
     except ValueError:
         return HttpResponseBadRequest()
+
+
+def shift_hour_by_delta(day, hour, hours_delta):
+    """Calcula a nova hora somando/subtraindo um delta de horas.
+
+    - day: data do agendamento (date)
+    - hour: hora atual do agendamento (time)
+    - hours_delta: inteiro representando o deslocamento de horas
+    """
+    base_dt = datetime.combine(day, hour)
+    return (base_dt + timedelta(hours=hours_delta)).time()
