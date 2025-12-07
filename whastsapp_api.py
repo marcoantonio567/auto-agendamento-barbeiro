@@ -3,7 +3,7 @@ import getenv
 
 
 def send_mensage(number: str, text: str):
-    url = "http://localhost:8081/message/sendText/bacalhau"
+    url = "http://localhost:8082/message/sendText/bacalhau"
     DEFAULT_COUNTRY_CODE = "55"
     payload = {
         "number": DEFAULT_COUNTRY_CODE + number,
