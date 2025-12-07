@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'agendamento',
     'pagamentos',
-    'painel',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
@@ -124,7 +124,7 @@ ADMIN_BASIC_USER = 'admin'
 ADMIN_BASIC_PASSWORD = 'admin'
 
 LOGIN_URL = '/admin/entrar/'
-LOGIN_REDIRECT_URL = '/admin/painel/'
+LOGIN_REDIRECT_URL = '/admin/dashboard/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

@@ -42,3 +42,4 @@
 .shift-option.selected{background:#f0fdf4;border-color:var(--accent)}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end}
 .btn-secondary{padding:12px 24px;border:1px solid #d1d5db;border-radius:8px;background:#f9fafb;color:#111827;cursor:pointer;font-weight:600}
+
