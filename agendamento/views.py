@@ -6,7 +6,7 @@ from barbearia.helpers.datas import sete_dias_futuros, converter_str_para_date, 
 from barbearia.helpers.disponibilidade import available_hours_for_day, horario_ja_ocupado, horarios_disponiveis_response
 from barbearia.helpers.validacao import dia_e_hora_validos , verificar_step
 from barbearia.helpers.phone_validation import PhoneValidator
-from barbearia.helpers.fluxo import criar_agendamento_e_redirecionar, obter_dados_step_client
+from barbearia.helpers.fluxo import criar_agendamento_e_redirecionar, get_datas_step_client
 
 @require_http_methods(["GET","POST"])
 def step_service(request):
@@ -64,7 +64,7 @@ def step_client(request):
     cria o agendamento (Appointment), limpa a sessão e redireciona para pagamento."""
     verificar_step(request, 'hour')
     if request.method == 'POST':
-        data = obter_dados_step_client(request)
+        data = get_datas_step_client(request)
         if not data:
             return HttpResponseBadRequest()
         client_name, client_phone, service, barber, date_str, hour_str = data

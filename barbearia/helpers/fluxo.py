@@ -20,7 +20,7 @@ def criar_agendamento_e_redirecionar(request, client_name, client_phone, service
     sid = Signer().sign(ap.id)
     return redirect('pagamento', sid=sid)
 
-def obter_dados_step_client(request):
+def get_datas_step_client(request):
     client_name = request.POST.get('client_name')
     client_phone = request.POST.get('client_phone')
     service = request.session.get('service')
