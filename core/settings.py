@@ -139,6 +139,10 @@ ADMIN_BASIC_PASSWORD = 'admin'
 LOGIN_URL = '/admin/entrar/'
 LOGIN_REDIRECT_URL = '/admin/dashboard/'
 
+# Self-service access token
+SELF_SERVICE_TOKEN_KEY = os.environ.get('SELF_SERVICE_TOKEN_KEY')
+REQUIRE_SELF_SERVICE_TOKEN = os.environ.get('REQUIRE_SELF_SERVICE_TOKEN', '0').lower() in {'1', 'true', 'yes'}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

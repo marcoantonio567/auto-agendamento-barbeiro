@@ -9,4 +9,5 @@ urlpatterns = [
     path('hora/', views.step_hour, name='step_hour'),
     path('cliente/', views.step_client, name='step_client'),
     path('api/horarios/', views.horarios_api, name='horarios_api'),
+    path('entrada/', views.self_service_entry, name='self_service_entry'),
 ]

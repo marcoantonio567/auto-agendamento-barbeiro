@@ -1,28 +1,167 @@
 {% extends 'scheduling/base.html' %}
 {% load static %}
+
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'payments/css/pagamento.css' %}" />
+<link rel="stylesheet" href="{% static 'payments/css/pagamento.css' %}">
 {% endblock %}
+
 {% block content %}
-<section>
+<section class="payment">
+
     <h2>Pagamento</h2>
-    <div class="card">
-        <p><strong>Cliente:</strong> {{ ap.client_name }}</p>
-        <p><strong>Telefone:</strong> {{ ap.client_phone }}</p>
-        <p><strong>Serviço:</strong> {{ ap.service_label }} - R${{ ap.price }}</p>
-        <p><strong>Barbeiro:</strong> {{ ap.barber }}</p>
-        <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} {{ ap.hour|time:'H:i' }}</p>
-        <p><strong>Status:</strong> {{ ap.get_payment_status_display }}</p>
-        <p><strong>Horário alterado:</strong> {% if ap.rescheduled %}Sim{% else %}Não{% endif %}</p>
+
+    <div class="payment-grid">
+
+        <!-- Card: Agendamento -->
+        <div class="card ap-card">
+            <h3 class="card-title">Agendamento</h3>
+
+            <p><strong>Cliente:</strong> {{ ap.client_name }}</p>
+            <p><strong>Telefone:</strong> {{ ap.client_phone }}</p>
+            <p><strong>Serviço:</strong> {{ ap.service_label }} - R${{ ap.price }}</p>
+            <p><strong>Barbeiro:</strong> {{ ap.barber }}</p>
+            <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} {{ ap.hour|time:'H:i' }}</p>
+            <p><strong>Status:</strong> {{ ap.get_payment_status_display }}</p>
+            <p><strong>Horário alterado:</strong> {{ ap.rescheduled|yesno:"Sim,Não" }}</p>
+        </div>
+
+        <!-- Card: PIX -->
+        {% if qr.ok and ap.payment_status != 'pago' %}
+        <div class="card qr-card">
+            <h3 class="card-title">Pague com Pix</h3>
+
+            {% if qr.qr_code_image_url %}
+            <img src="{{ qr.qr_code_image_url }}" alt="QR Code" class="qr-image">
+            {% endif %}
+
+            {% if qr.qr_code_text %}
+            <div class="pix-text-box">
+                <p class="muted">Pix copia e cola</p>
+                <pre id="pix-text" class="pix-text">{{ qr.qr_code_text }}</pre>
+                <button type="button" class="btn-secondary" id="copy-pix">Copiar PIX</button>
+            </div>
+            {% endif %}
+
+            {% if qr.url %}
+            <p class="payment-link">
+                <a href="{{ qr.url }}" target="_blank" rel="noopener">Abrir link de pagamento</a>
+            </p>
+            {% endif %}
+
+            <!-- Contador -->
+            <div class="countdown" data-expires="{{ qr.expires_at|default:'' }}">
+                <span>Expira em</span>
+                <span class="badge" id="expires-countdown">--:--</span>
+                <span class="auto-refresh">Atualiza a cada 30s</span>
+            </div>
+        </div>
+        {% endif %}
     </div>
-    <form method="post" action="{% url 'pagamento_confirmar' sid %}" style="display:inline">
-        {% csrf_token %}
-        <button type="submit">Pagar</button>
-    </form>
-    <form method="post" action="{% url 'pagamento_falhar' sid %}" style="display:inline">
-        {% csrf_token %}
-        <button type="submit">Simular Falha</button>
-    </form>
-    <p><a href="/">Voltar</a></p>
+
+    <!-- Card: Detalhes do pagamento -->
+    {% if qr.error %}
+    <div class="card error-card">
+        <h3 class="card-title">Erro</h3>
+        <p>{{ qr.error }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Ações -->
+    <div class="actions payment-actions">
+        <form method="post" action="{% url 'pagamento_confirmar' sid %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary">Pagar</button>
+        </form>
+
+    </div>
+
+    <p class="muted"><a href="/">Voltar</a></p>
+
 </section>
+
+<!-- Scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ======================
+       Copiar código PIX
+    ====================== */
+    const copyBtn = document.getElementById('copy-pix');
+    const pixTextEl = document.getElementById('pix-text');
+
+    if (copyBtn && pixTextEl) {
+        copyBtn.addEventListener('click', function () {
+            const txt = (pixTextEl.textContent || '').trim();
+            if (!txt) return;
+
+            navigator.clipboard.writeText(txt)
+                .then(() => {
+                    copyBtn.textContent = 'Copiado!';
+                    setTimeout(() => copyBtn.textContent = 'Copiar PIX', 1500);
+                })
+                .catch(() => {
+                    const ta = document.createElement('textarea');
+                    ta.value = txt;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    ta.remove();
+                });
+        });
+    }
+
+    /* ======================
+       Contador regressivo
+    ====================== */
+    const countdownEl = document.getElementById('expires-countdown');
+    const countdownBox = document.querySelector('.countdown');
+    const expiresIso = countdownBox?.getAttribute('data-expires');
+    const expiresAt = expiresIso ? new Date(expiresIso) : null;
+
+    function formatCountdown(ms) {
+        if (ms <= 0) return '00:00';
+        const totalSec = Math.floor(ms / 1000);
+        const h = Math.floor(totalSec / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = totalSec % 60;
+
+        return (h > 0 ? String(h).padStart(2, '0') + ':' : '')
+            + String(m).padStart(2, '0') + ':'
+            + String(s).padStart(2, '0');
+    }
+
+    if (expiresAt && countdownEl) {
+        function tick() {
+            const diff = expiresAt - new Date();
+            countdownEl.textContent = formatCountdown(diff);
+        }
+        tick();
+        setInterval(tick, 1000);
+    }
+
+    /* ======================
+       Auto refresh (30s)
+    ====================== */
+    if (document.querySelector('.countdown')) {
+        setInterval(() => window.location.reload(), 30000);
+    }
+
+    const checkUrl = "{% url 'pagamento_check' sid %}";
+    const hasQr = !!document.querySelector('.qr-card');
+    if (hasQr) {
+        const poll = async () => {
+            try {
+                const res = await fetch(checkUrl, { cache: 'no-store' });
+                const data = await res.json();
+                if (data && data.paid) {
+                    alert('Pagamento confirmado!');
+                    window.location.href = "{% url 'pagamento' sid %}";
+                }
+            } catch (e) {}
+        };
+        setInterval(poll, 5000);
+    }
+});
+</script>
+
 {% endblock %}

@@ -3,6 +3,7 @@ from django.conf import settings
 from core.models import BaseModel
 from payments.constans import PAYMENT_METHOD, PAYMENT_STATUS
 
+
 class Payment(BaseModel):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

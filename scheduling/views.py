@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
+from core.helpers.self_service_token import validar_token
 from core.helpers.infos import SERVICES, BARBERS
 from core.helpers.datas import get_future_days, convert_str_to_date, convert_str_to_day_and_hour
 from core.helpers.disponibilidade import available_hours_for_day, horario_ja_ocupado, horarios_disponiveis_response
@@ -11,6 +13,8 @@ from core.helpers.fluxo import criar_agendamento_e_redirecionar, get_datas_step_
 
 @require_http_methods(["GET","POST"])
 def step_service(request):
+    if getattr(settings, 'REQUIRE_SELF_SERVICE_TOKEN', False) and not request.session.get('self_service_ok'):
+        return HttpResponseBadRequest()
     if request.method == 'POST':
         request.session['service'] = request.POST.get('service')
         return redirect('step_barber')
@@ -65,3 +69,28 @@ def horarios_api(request):
     barber = request.GET.get('barber')
     date_str = request.GET.get('date')
     return horarios_disponiveis_response(barber, date_str)
+
+
+@require_http_methods(["GET"])
+def self_service_entry(request):
+    token = request.GET.get('t') or request.GET.get('token')
+    if not token:
+        return HttpResponseBadRequest()
+    data = validar_token(token)
+    if not data:
+        return HttpResponseBadRequest()
+    request.session['self_service_ok'] = True
+    service = data.get('service')
+    barber = data.get('barber')
+    client_phone = data.get('client_phone')
+    if service:
+        request.session['service'] = service
+    if barber:
+        request.session['barber'] = barber
+    if client_phone:
+        request.session['client_phone_prefill'] = client_phone
+    if request.session.get('service') and request.session.get('barber'):
+        return redirect('step_date')
+    if request.session.get('service'):
+        return redirect('step_barber')
+    return redirect('step_service')

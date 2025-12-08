@@ -1,1 +1,192 @@
+/* ================================
+   Variáveis de Tema (opcional)
+=================================== */
+:root {
+    --border-color: #e5e7eb;
+    --text-dark: #111827;
+    --text-muted: #374151;
+    --text-light: #6b7280;
+    --bg-soft: #f6f6f6;
+    --bg-light: #f9fafb;
+    --bg-hover: #f3f4f6;
+    --danger-bg: #ffecec;
+    --danger-border: #f5b5b5;
+    --radius: 8px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+}
 
+/* ================================
+   Layout Geral
+=================================== */
+
+.payment {
+    display: block;
+}
+
+.payment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Responsividade */
+@media (max-width: 800px) {
+    .payment-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================================
+   Cards
+=================================== */
+
+.ap-card,
+.qr-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.qr-card {
+    gap: var(--spacing-md);
+    align-items: flex-start;
+}
+
+.qr-image {
+    max-width: 280px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    display: block;
+}
+
+.card-title {
+    margin: 0 0 var(--spacing-sm) 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* ================================
+   PIX Copia e Cola
+=================================== */
+
+.pix-text-box {
+    width: 100%;
+}
+
+.pix-text {
+    white-space: pre-wrap;
+    word-break: break-all;
+    background: var(--bg-soft);
+    padding: var(--spacing-md);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    max-height: 220px;
+    overflow: auto;
+}
+
+/* ================================
+   Links
+=================================== */
+
+.payment-link a {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.payment-link a:hover {
+    text-decoration: underline;
+}
+
+/* ================================
+   Countdown
+=================================== */
+
+.countdown {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: var(--spacing-sm);
+}
+
+.countdown .auto-refresh {
+    color: var(--text-light);
+}
+
+/* ================================
+   Badge
+=================================== */
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+/* ================================
+   Grid de Detalhes
+=================================== */
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.gateway-info {
+    margin-top: var(--spacing-sm);
+}
+
+/* ================================
+   Estados de Erro
+=================================== */
+
+.error-card {
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    padding: var(--spacing-md);
+    border-radius: var(--radius);
+}
+
+/* ================================
+   Ações
+=================================== */
+
+.actions {
+    display: flex;
+    gap: var(--spacing-lg);
+    align-items: center;
+    margin-top: var(--spacing-lg);
+}
+
+.payment-actions form {
+    display: inline;
+}
+
+/* ================================
+   Botões
+=================================== */
+
+.btn-secondary {
+    padding: var(--spacing-md) 24px;
+    border: 1px solid #d1d5db;
+    border-radius: var(--radius);
+    background: var(--bg-light);
+    color: var(--text-dark);
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: var(--bg-hover);
+}
