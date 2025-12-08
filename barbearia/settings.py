@@ -15,6 +15,15 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+ENV_FILE = BASE_DIR / '.env'
+if ENV_FILE.exists():
+    for _line in ENV_FILE.read_text().splitlines():
+        _line = _line.strip()
+        if not _line or _line.startswith('#'):
+            continue
+        if '=' in _line:
+            _k, _v = _line.split('=', 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
 
 
 # Quick-start development settings - unsuitable for production
@@ -132,5 +141,3 @@ LOGIN_REDIRECT_URL = '/admin/dashboard/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EVOLUTION_API_URL = os.getenv('EVOLUTION_API_URL', 'http://localhost:8082')
-EVOLUTION_API_KEY = os.getenv('AUTHENTICATION_API_KEY', '162636')

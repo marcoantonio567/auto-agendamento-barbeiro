@@ -146,11 +146,11 @@ def admin_shift_hour(request, appointment_id, direction):
     try:
         phone_digits = PhoneValidator.extract_digits(ap.client_phone)
         if phone_digits and len(phone_digits) == 10:
-            print(phone_digits)
+            
             date_str = ap.date.strftime('%d/%m/%Y')
             hour_str = new_hour.strftime('%H:%M')
             text = f"Olá, {ap.client_name}! Seu horário com {ap.barber} foi alterado para {date_str} às {hour_str}."
-            send_mensage(str(phone_digits), text)
+            send_mensage(phone_digits, text)
     except Exception:
         pass
 
