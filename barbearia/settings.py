@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -130,3 +131,6 @@ LOGIN_REDIRECT_URL = '/admin/dashboard/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EVOLUTION_API_URL = os.getenv('EVOLUTION_API_URL', 'http://localhost:8082')
+EVOLUTION_API_KEY = os.getenv('AUTHENTICATION_API_KEY', '162636')

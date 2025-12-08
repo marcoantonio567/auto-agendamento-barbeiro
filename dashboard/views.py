@@ -11,6 +11,8 @@ from barbearia.helpers.disponibilidade import horario_ja_ocupado
 from barbearia.helpers.validacao import get_hours_delta_from_direction
 from barbearia.helpers.datas import shift_hour_by_delta
 from barbearia.helpers.slots import is_valid_slot_for_day
+from barbearia.helpers.phone_validation import PhoneValidator
+from whastsapp_api import send_mensage
 
 
 @login_required(login_url='login')
@@ -139,6 +141,18 @@ def admin_shift_hour(request, appointment_id, direction):
     ap.rescheduled = True
     # Salva apenas os campos modificados para eficiência
     ap.save(update_fields=['hour', 'rescheduled'])
+
+    # Envia mensagem ao cliente informando o novo horário
+    try:
+        phone_digits = PhoneValidator.extract_digits(ap.client_phone)
+        if phone_digits and len(phone_digits) == 10:
+            print(phone_digits)
+            date_str = ap.date.strftime('%d/%m/%Y')
+            hour_str = new_hour.strftime('%H:%M')
+            text = f"Olá, {ap.client_name}! Seu horário com {ap.barber} foi alterado para {date_str} às {hour_str}."
+            send_mensage(str(phone_digits), text)
+    except Exception:
+        pass
 
     # Informa sucesso e retorna para a página de detalhes
     messages.success(request, 'Agendamento movido com sucesso')

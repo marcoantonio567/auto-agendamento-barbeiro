@@ -24,6 +24,13 @@ class PhoneValidator:
     @staticmethod
     def extract_digits(value: str) -> str:
         """Extrai somente os dígitos do valor informado."""
+        raw = ''.join(ch for ch in (value or '') if ch.isdigit())
+        if len(raw) >= 3 and raw[2] == '9':
+            return raw[:2] + raw[3:]
+        return raw
+
+    @staticmethod
+    def extract_raw_digits(value: str) -> str:
         return ''.join(ch for ch in (value or '') if ch.isdigit())
 
     @staticmethod
@@ -34,12 +41,12 @@ class PhoneValidator:
     @classmethod
     def has_correct_length(cls, value: str) -> bool:
         """Confere se o telefone possui 11 dígitos (celular com DDD)."""
-        return len(cls.extract_digits(value)) == 11
+        return len(cls.extract_raw_digits(value)) == 11
 
     @classmethod
     def is_valid_ddd(cls, value: str) -> bool:
         """Valida se o DDD (dois primeiros dígitos) é válido no Brasil."""
-        digits = cls.extract_digits(value)
+        digits = cls.extract_raw_digits(value)
         ddd = digits[:2] if len(digits) >= 2 else ''
         return ddd in cls.VALID_DDD
 
@@ -51,7 +58,7 @@ class PhoneValidator:
     @classmethod
     def is_valid_brazil_number(cls, value: str) -> bool:
         """Valida número de celular brasileiro: 11 dígitos, DDD válido, e começa com 9."""
-        digits = cls.extract_digits(value)
+        digits = cls.extract_raw_digits(value)
         if len(digits) != 11:
             return False
         if digits[0:2] not in cls.VALID_DDD:
@@ -70,4 +77,3 @@ class PhoneValidator:
             'format_match': cls.matches_br_format(value),
             'valid_brazil_number': cls.is_valid_brazil_number(value),
         }
-
