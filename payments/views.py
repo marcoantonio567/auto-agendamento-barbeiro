@@ -6,7 +6,7 @@ from core.helpers.fluxo import get_appointment_by_sid_or_404
 @require_http_methods(["GET"])
 def pagamento(request, sid):
     ap = get_appointment_by_sid_or_404(sid)
-    return render(request, 'pagamentos/pagamento.html', {'ap': ap, 'sid': sid})
+    return render(request, 'payments/pagamento.html', {'ap': ap, 'sid': sid})
 
 
 @require_http_methods(["POST"])
