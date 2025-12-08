@@ -1,5 +1,6 @@
 .form-group{display:flex;flex-direction:column;gap:8px;text-align:left;width:100%;max-width:400px}
 .form-group input{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;background:#ffffff;color:var(--text)}
+.form-group.invalid input{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,0.15)}
 .actions{display:flex;gap:12px;justify-content:center;margin-top:16px}
 .btn-primary{padding:12px 24px;border:none;border-radius:8px;background:var(--accent);color:#05290f;font-weight:600;cursor:pointer;font-size:16px}
 .btn-primary:hover{opacity:.9}
@@ -41,6 +42,7 @@ select,input[type=text],input[type=date],input[type=time]{width:100%;padding:10p
 .icon-swap[data-visible="true"] .icon-eye{display:none}
 .icon-swap[data-visible="true"] .icon-eye-off{display:inline}
 .muted{color:var(--muted);font-size:14px;margin-top:8px}
+.error-text{color:#ef4444;font-size:14px;margin-top:6px}
 .checkbox{display:flex;align-items:center;gap:10px;padding:0;border:none;border-radius:0;background:transparent;width:auto;justify-content:flex-start;cursor:pointer}
 .checkbox input[type=checkbox]{width:22px;height:22px;margin:0;accent-color:var(--accent);flex-shrink:0}
 .checkbox span{font-size:16px;line-height:1.25}
