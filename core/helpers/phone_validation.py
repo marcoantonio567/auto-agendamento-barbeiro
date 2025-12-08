@@ -7,7 +7,6 @@ class PhoneValidator:
     Classe utilitária para validação de números de telefone brasileiros.
     """
 
-    # Conjunto de DDDs válidos no Brasil
     VALID_DDD = {
         '11','12','13','14','15','16','17','18','19',
         '21','22','24','27','28',
@@ -23,7 +22,6 @@ class PhoneValidator:
 
     @staticmethod
     def extract_digits(value: str) -> str:
-        """Extrai somente os dígitos do valor informado."""
         raw = ''.join(ch for ch in (value or '') if ch.isdigit())
         if len(raw) >= 3 and raw[2] == '9':
             return raw[:2] + raw[3:]
@@ -35,29 +33,24 @@ class PhoneValidator:
 
     @staticmethod
     def contains_only_numbers(value: str) -> bool:
-        """Verifica se a string contém apenas números (sem espaços ou símbolos)."""
         return (value or '').isdigit()
 
     @classmethod
     def has_correct_length(cls, value: str) -> bool:
-        """Confere se o telefone possui 11 dígitos (celular com DDD)."""
         return len(cls.extract_raw_digits(value)) == 11
 
     @classmethod
     def is_valid_ddd(cls, value: str) -> bool:
-        """Valida se o DDD (dois primeiros dígitos) é válido no Brasil."""
         digits = cls.extract_raw_digits(value)
         ddd = digits[:2] if len(digits) >= 2 else ''
         return ddd in cls.VALID_DDD
 
     @staticmethod
     def matches_br_format(value: str) -> bool:
-        """Valida o formato esperado: (DDD) 9XXXX-XXXX (espaço após o 9 é opcional)."""
         return bool(re.fullmatch(r"\(\d{2}\)\s9\s?\d{4}-\d{4}", (value or '')))
 
     @classmethod
     def is_valid_brazil_number(cls, value: str) -> bool:
-        """Valida número de celular brasileiro: 11 dígitos, DDD válido, e começa com 9."""
         digits = cls.extract_raw_digits(value)
         if len(digits) != 11:
             return False
@@ -69,7 +62,6 @@ class PhoneValidator:
 
     @classmethod
     def diagnostics(cls, value: str) -> Dict[str, bool]:
-        """Retorna um diagnóstico com o resultado de cada checagem."""
         return {
             'only_numbers': cls.contains_only_numbers(value),
             'correct_length': cls.has_correct_length(value),

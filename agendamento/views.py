@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
-from barbearia.helpers.infos import SERVICES, BARBERS
-from barbearia.helpers.datas import get_future_days, convert_str_to_date, convert_str_to_day_and_hour
-from barbearia.helpers.disponibilidade import available_hours_for_day, horario_ja_ocupado, horarios_disponiveis_response
-from barbearia.helpers.validacao import dia_e_hora_validos , verificar_step
-from barbearia.helpers.phone_validation import PhoneValidator
-from barbearia.helpers.fluxo import criar_agendamento_e_redirecionar, get_datas_step_client
+from core.helpers.infos import SERVICES, BARBERS
+from core.helpers.datas import get_future_days, convert_str_to_date, convert_str_to_day_and_hour
+from core.helpers.disponibilidade import available_hours_for_day, horario_ja_ocupado, horarios_disponiveis_response
+from core.helpers.validacao import dia_e_hora_validos , verificar_step
+from core.helpers.phone_validation import PhoneValidator
+from core.helpers.fluxo import criar_agendamento_e_redirecionar, get_datas_step_client
 
 @require_http_methods(["GET","POST"])
 def step_service(request):

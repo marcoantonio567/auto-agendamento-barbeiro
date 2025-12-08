@@ -3,16 +3,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout as django_logout
 from django.views import View
 from agendamento.models import Appointment
-from barbearia.helpers.infos import obter_barbers_keys
-from barbearia.helpers.fluxo import list_filtered_appointments, get_hours_opts, get_dates_opts
+from core.helpers.infos import obter_barbers_keys
+from core.helpers.fluxo import list_filtered_appointments, get_hours_opts, get_dates_opts
 from datetime import date, timedelta, datetime
 from django.db.models import Q
 from django.contrib import messages
-from barbearia.helpers.disponibilidade import horario_ja_ocupado
-from barbearia.helpers.validacao import get_hours_delta_from_direction
-from barbearia.helpers.datas import shift_hour_by_delta
-from barbearia.helpers.slots import is_valid_slot_for_day
-from barbearia.helpers.phone_validation import PhoneValidator
+from core.helpers.disponibilidade import horario_ja_ocupado
+from core.helpers.validacao import get_hours_delta_from_direction
+from core.helpers.datas import shift_hour_by_delta
+from core.helpers.slots import is_valid_slot_for_day
+from core.helpers.phone_validation import PhoneValidator
 from whastsapp_api import send_mensage
 
 

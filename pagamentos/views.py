@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
-from barbearia.helpers.fluxo import get_appointment_by_sid_or_404
+from core.helpers.fluxo import get_appointment_by_sid_or_404
 
 
 @require_http_methods(["GET"])
