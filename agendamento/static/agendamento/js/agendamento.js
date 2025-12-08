@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded',()=>{
+  // Inicialização e utilitários da página de agendamento
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
     window.lucide.createIcons();
   }
@@ -7,6 +8,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const cb = document.getElementById('save_name_checkbox');
   const phoneGroup = document.getElementById('client_phone_group');
   const phoneErr = document.getElementById('client_phone_error');
+  // Máscara de telefone BR: (DD) 9XXXX-XXXX
   const formatBrPhone = (value)=>{
     const digits = (value||'').replace(/\D/g,'').slice(0,11);
     const a = digits.slice(0,2);
@@ -21,6 +23,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(d) out += `-${d}`;
     return out;
   };
+  // Persistência do nome e telefone do cliente (opt-in)
   if(inp){
     const opt = localStorage.getItem('client_name_opt_in') === '1';
     if(cb){ cb.checked = opt; }
@@ -28,7 +31,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       const saved = localStorage.getItem('client_name');
       if(saved) inp.value = saved;
       const savedPhone = localStorage.getItem('client_phone');
-      if(phoneInp && savedPhone) phoneInp.value = savedPhone;
+      if(phoneInp && savedPhone) phoneInp.value = formatBrPhone(savedPhone);
     }
     inp.addEventListener('input',()=>{
       if(cb && cb.checked){
@@ -36,6 +39,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
     });
   }
+  // Validação e máscara do telefone do cliente
   if(phoneInp){
     const VALID_DDD = new Set([
       '11','12','13','14','15','16','17','18','19',
@@ -49,7 +53,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       '81','82','83','84','85','86','87','88','89',
       '91','92','93','94','95','96','97','98','99'
     ]);
+    // Utilitário: mantém apenas dígitos
     const digits = (v)=>String(v||'').replace(/\D/g,'');
+    // Regra de validade: 11 dígitos, DDD válido e nono dígito = 9
     const isValidPhone = (v)=>{
       const d = digits(v);
       if(d.length !== 11) return false;
@@ -57,6 +63,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(d[2] !== '9') return false;
       return true;
     };
+    // Exibe mensagem de erro e estilo
     const showPhoneError = ()=>{
       if(phoneErr){
         phoneErr.textContent = 'Número de telefone inválido. Por favor, revise e digite novamente. Formato esperado: (DDD) 9XXXX-XXXX';
@@ -64,10 +71,12 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
       if(phoneGroup){ phoneGroup.classList.add('invalid'); }
     };
+    // Limpa mensagem de erro e estilo
     const clearPhoneError = ()=>{
       if(phoneErr){ phoneErr.hidden = true; phoneErr.textContent = ''; }
       if(phoneGroup){ phoneGroup.classList.remove('invalid'); }
     };
+    // Aplica máscara, persiste (se opt-in) e valida
     const applyMask = ()=>{
       const masked = formatBrPhone(phoneInp.value);
       phoneInp.value = masked;
@@ -80,10 +89,6 @@ document.addEventListener('DOMContentLoaded',()=>{
         showPhoneError();
       }
     };
-    const savedPhoneRaw = localStorage.getItem('client_phone');
-    if(cb && cb.checked && savedPhoneRaw){
-      phoneInp.value = formatBrPhone(savedPhoneRaw);
-    }
     phoneInp.addEventListener('input', applyMask);
     phoneInp.addEventListener('blur', applyMask);
     const form = phoneInp.closest('form');
@@ -99,6 +104,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       });
     }
   }
+  // Opt-in/out para salvar nome e telefone do cliente
   if(cb){
     cb.addEventListener('change',()=>{
       if(cb.checked){
@@ -114,6 +120,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
     });
   }
+  // UI de cartões de opção com auto-submit
   document.querySelectorAll('.options').forEach(container=>{
     const cards = container.querySelectorAll('label.option-card');
     const autoAttr = container.getAttribute('data-autosubmit');
@@ -158,6 +165,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   const toggleBtn = document.getElementById('toggle-password');
   const pwdInput = document.getElementById('password');
+  // Alterna visibilidade do campo de senha
   if(toggleBtn && pwdInput){
     const swap = toggleBtn.querySelector('.icon-swap');
     toggleBtn.addEventListener('click',()=>{
@@ -170,6 +178,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   const adminUserInput = document.getElementById('username');
   const saveCredsCb = document.getElementById('save_creds_checkbox');
+  // Persistência do usuário admin (opt-in)
   if(adminUserInput){
     const opt = localStorage.getItem('admin_username_opt_in') === '1';
     if(saveCredsCb){ saveCredsCb.checked = opt; }
@@ -183,6 +192,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
     });
   }
+  // Opt-in/out para salvar usuário admin
   if(saveCredsCb){
     saveCredsCb.addEventListener('change',()=>{
       if(saveCredsCb.checked){

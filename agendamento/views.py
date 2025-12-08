@@ -4,7 +4,8 @@ from django.views.decorators.http import require_http_methods
 from barbearia.helpers.infos import SERVICES, BARBERS
 from barbearia.helpers.datas import sete_dias_futuros, converter_str_para_date, converter_str_para_day_e_hora
 from barbearia.helpers.disponibilidade import available_hours_for_day, horario_ja_ocupado, horarios_disponiveis_response
-from barbearia.helpers.validacao import dia_e_hora_validos , verificar_step, validar_telefone_brasil
+from barbearia.helpers.validacao import dia_e_hora_validos , verificar_step
+from barbearia.helpers.phone_validation import PhoneValidator
 from barbearia.helpers.fluxo import criar_agendamento_e_redirecionar, obter_dados_step_client
 
 @require_http_methods(["GET","POST"])
@@ -67,7 +68,7 @@ def step_client(request):
         if not data:
             return HttpResponseBadRequest()
         client_name, client_phone, service, barber, date_str, hour_str = data
-        if not validar_telefone_brasil(client_phone):
+        if not PhoneValidator.is_valid_brazil_number(client_phone):
             return HttpResponseBadRequest()
         day, hr = converter_str_para_day_e_hora(date_str, hour_str)
         if not dia_e_hora_validos(day, hr):
