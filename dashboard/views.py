@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout as django_logout
 from django.views import View
-from agendamento.models import Appointment
+from scheduling.models import Appointment
 from core.helpers.infos import obter_barbers_keys
 from core.helpers.fluxo import list_filtered_appointments, get_hours_opts, get_dates_opts
 from datetime import date, timedelta, datetime

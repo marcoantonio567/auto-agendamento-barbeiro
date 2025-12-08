@@ -25,22 +25,22 @@ BARBERS = [
     {
         'key': 'Japa',
         'name': 'Japa',
-        'photo': '/static/agendamento/img/barbers/japa.svg',
+        'photo': '/static/scheduling/img/barbers/japa.svg',
     },
     {
         'key': 'João',
         'name': 'João',
-        'photo': '/static/agendamento/img/barbers/joao.svg',
+        'photo': '/static/scheduling/img/barbers/joao.svg',
     },
     {
         'key': 'Marco',
         'name': 'Marco',
-        'photo': '/static/agendamento/img/barbers/marco.svg',
+        'photo': '/static/scheduling/img/barbers/marco.svg',
     },
     {
         'key': 'Daniel',
         'name': 'Daniel',
-        'photo': '/static/agendamento/img/barbers/daniel.svg',
+        'photo': '/static/scheduling/img/barbers/daniel.svg',
     },
 ]
 

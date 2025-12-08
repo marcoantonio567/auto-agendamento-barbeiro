@@ -1,4 +1,4 @@
-from agendamento.models import Appointment
+from scheduling.models import Appointment
 from .slots import slots_for_day
 from django.http import JsonResponse
 from core.helpers.datas import convert_str_to_date, json_empty_hours

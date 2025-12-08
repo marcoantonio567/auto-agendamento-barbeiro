@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from django.http import Http404
 from django.core.signing import Signer, BadSignature
-from agendamento.models import Appointment
+from scheduling.models import Appointment
 from django.shortcuts import get_object_or_404
 from core.helpers.datas import convert_str_to_date, convert_str_to_time
 from datetime import time, date, datetime

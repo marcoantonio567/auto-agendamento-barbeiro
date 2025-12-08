@@ -1,0 +1,40 @@
+{% extends 'scheduling/step_base.html' %}
+{% load static %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'scheduling/css/step_client.css' %}" />
+{% endblock %}
+{% block content %}
+<section class="step step-client">
+    <div class="step-icon">
+        <i data-lucide="user-plus"></i>
+    </div>
+    <h2>Qual seu nome?</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="client_name">Nome e Sobrenome</label>
+            <div class="input-with-icon">
+                <i data-lucide="user" class="input-icon"></i>
+                <input type="text" name="client_name" id="client_name" required placeholder="Digite seu nome" autocomplete="name" />
+            </div>
+        </div>
+        <div class="form-group" id="client_phone_group">
+            <label for="client_phone">Telefone</label>
+            <div class="input-with-icon">
+                <i data-lucide="phone" class="input-icon"></i>
+                <input type="tel" name="client_phone" id="client_phone" required placeholder="(11) 9 1234-5678" inputmode="numeric" autocomplete="tel" maxlength="16" />
+            </div>
+            <p class="error-text" id="client_phone_error" aria-live="polite" hidden></p>
+        </div>
+        <div class="form-group checkbox-group">
+            <label class="checkbox">
+                <input type="checkbox" id="save_name_checkbox" />
+                <span>Salvar meu nome e telefone</span>
+            </label>
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn-primary">Prosseguir para pagamento</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

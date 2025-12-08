@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'agendamento',
+    'scheduling',
     'pagamentos',
     'dashboard',
 ]
@@ -67,7 +67,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates', BASE_DIR / 'scheduling' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,7 +128,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'core' / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'core' / 'static', BASE_DIR / 'scheduling' / 'static']
 
 ADMIN_BASIC_USER = 'admin'
 ADMIN_BASIC_PASSWORD = 'admin'

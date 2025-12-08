@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Barbearia</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'scheduling/css/base.css' %}" />
+    <link rel="stylesheet" href="{% static 'scheduling/css/components.css' %}" />
+    {% block styles %}{% endblock %}
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="stylesheet" href="https://unpkg.com/lucide@latest/font/lucide.css" />
+</head>
+<body>
+    <header class="topbar">
+        <h1>Barbearia</h1>
+    </header>
+    <main class="container">
+        <div class="{% if is_painel %}painel-layout{% endif %}">
+            {% if is_painel %}
+            <aside class="sidebar">
+                <a href="{% url 'admin_list' %}" class="{% if request.resolver_match.url_name == 'admin_list' %}active{% endif %}"><i data-lucide="calendar"></i> Agendamentos</a>
+                <a href="{% url 'admin_history' %}" class="{% if request.resolver_match.url_name == 'admin_history' %}active{% endif %}"><i data-lucide="history"></i> Histórico</a>
+                <a href="{% url 'admin_finance' %}" class="{% if request.resolver_match.url_name == 'admin_finance' %}active{% endif %}"><i data-lucide="wallet"></i> Financeiro</a>
+            </aside>
+            {% endif %}
+            <section class="{% if is_painel %}pane-content{% endif %}">
+                {% if messages %}
+                <div class="messages">
+                    {% for m in messages %}
+                    <div class="message">{{ m }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </section>
+        </div>
+    </main>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="{% static 'scheduling/js/agendamento.js' %}"></script>
+</body>
+</html>

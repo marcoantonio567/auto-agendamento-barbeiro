@@ -1,0 +1,31 @@
+{% extends 'scheduling/step_base.html' %}
+{% load static %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'scheduling/css/step_service.css' %}" />
+{% endblock %}
+{% block content %}
+<section class="step">
+    <div class="step-icon">
+        <i data-lucide="scissors"></i>
+    </div>
+    <h2>Qual serviço você deseja?</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="options">
+            {% for s in services %}
+            <label class="option-card">
+                <input type="radio" name="service" value="{{ s.key }}" required />
+                <span class="option-icon option-icon-{{ s.key }}" aria-hidden="true">
+                    <i data-lucide="{{ s.icon }}"></i>
+                </span>
+                <div class="option-content">
+                    <span class="option-title">{{ s.label }}</span>
+                    <span class="option-desc">{{ s.description }}</span>
+                </div>
+                <span class="option-price">R${{ s.price }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </form>
+</section>
+{% endblock %}
