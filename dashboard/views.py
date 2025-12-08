@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout as django_logout
+from django.views import View
 from agendamento.models import Appointment
 from barbearia.helpers.infos import obter_barbers_keys
 from barbearia.helpers.fluxo import listar_agendamentos_filtrados
@@ -80,29 +81,63 @@ def admin_finance(request):
     })
 
 
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            remember = request.POST.get('remember')
-            if remember == 'on':
-                request.session.set_expiry(60*60*24*30)
-            else:
-                request.session.set_expiry(0)
-            next_url = request.GET.get('next') or 'admin_list'
-            return redirect(next_url)
-        return render(request, 'dashboard/login.html', {'error': 'Credenciais inválidas'})
-    if request.user.is_authenticated:
-        return redirect('admin_list')
-    return render(request, 'dashboard/login.html')
+class LoginView(View):
+    # Exibe o formulário de login ou redireciona se já autenticado
+    def get(self, request):
+        if self._is_authenticated(request):
+            return redirect('admin_list')
+        return self._render_login(request)
+
+    # Processa o envio do formulário de login
+    def post(self, request):
+        username, password = self._extract_credentials(request)
+        user = self._authenticate_user(request, username, password)
+        if user:
+            self._login_user(request, user)
+            self._apply_remember_me(request)
+            return self._redirect_next(request)
+        return self._render_login(request, error='Credenciais inválidas')
+
+    # Verifica se o usuário já está autenticado
+    def _is_authenticated(self, request):
+        return request.user.is_authenticated
+
+    # Extrai credenciais do POST
+    def _extract_credentials(self, request):
+        return request.POST.get('username'), request.POST.get('password')
+
+    # Tenta autenticar o usuário com Django
+    def _authenticate_user(self, request, username, password):
+        return authenticate(request, username=username, password=password)
+
+    # Realiza o login do usuário
+    def _login_user(self, request, user):
+        login(request, user)
+
+    # Ajusta o tempo de expiração da sessão conforme "remember"
+    def _apply_remember_me(self, request):
+        remember = request.POST.get('remember')
+        if remember == 'on':
+            request.session.set_expiry(60 * 60 * 24 * 30)  # 30 dias
+        else:
+            request.session.set_expiry(0)  # expira ao fechar o navegador
+
+    # Redireciona para a próxima URL ou para o dashboard
+    def _redirect_next(self, request):
+        next_url = request.GET.get('next') or 'admin_list'
+        return redirect(next_url)
+
+    # Renderiza a página de login com possível erro
+    def _render_login(self, request, error=None):
+        context = {'error': error} if error else {}
+        return render(request, 'dashboard/login.html', context)
 
 
-def logout_view(request):
-    logout(request)
-    return redirect('login')
+    # Efetua logout e redireciona para a página de login
+    @staticmethod
+    def logout(request):
+        django_logout(request)
+        return redirect('login')
 
 
 @login_required(login_url='login')
