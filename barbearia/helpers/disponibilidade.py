@@ -1,7 +1,7 @@
 from agendamento.models import Appointment
 from .slots import slots_for_day
 from django.http import JsonResponse
-from barbearia.helpers.datas import converter_str_para_date, json_horarios_vazio
+from barbearia.helpers.datas import convert_str_to_date, json_empty_hours
 
 def taken_hours(barber, day):
     """Retorna um conjunto de horas já ocupadas para o barbeiro no dia."""
@@ -24,10 +24,10 @@ def horarios_disponiveis_response(barber, date_str):
     """
     Retorna um JsonResponse com a lista de horários disponíveis para o barbeiro no dia informado.
     """
-    day = converter_str_para_date(date_str)
+    day = convert_str_to_date(date_str)
     if not barber or not date_str:
-        return json_horarios_vazio()
+        return json_empty_hours()
     if day is None:
-        return json_horarios_vazio()
+        return json_empty_hours()
     hours = available_hours_for_day(barber, day)
     return JsonResponse({'hours': hours})

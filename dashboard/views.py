@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout as django_logout
+from django.views import View
 from agendamento.models import Appointment
 from barbearia.helpers.infos import obter_barbers_keys
-from barbearia.helpers.fluxo import listar_agendamentos_filtrados
+from barbearia.helpers.fluxo import list_filtered_appointments, get_hours_opts, get_dates_opts
 from datetime import date, timedelta, datetime
 from django.db.models import Q
 from django.contrib import messages
@@ -11,6 +12,8 @@ from barbearia.helpers.disponibilidade import horario_ja_ocupado
 from barbearia.helpers.validacao import get_hours_delta_from_direction
 from barbearia.helpers.datas import shift_hour_by_delta
 from barbearia.helpers.slots import is_valid_slot_for_day
+from barbearia.helpers.phone_validation import PhoneValidator
+from whastsapp_api import send_mensage
 
 
 @login_required(login_url='login')
@@ -18,9 +21,9 @@ def admin_list(request):
     barber = request.GET.get('barber')
     day = request.GET.get('date')
     hour = request.GET.get('hour')
-    qs = listar_agendamentos_filtrados(barber, day, hour)
-    hours_opts = sorted({h.hour for h in qs.values_list('hour', flat=True)})
-    dates_opts = list(qs.order_by('date').values_list('date', flat=True).distinct())
+    qs = list_filtered_appointments(barber, day, hour)
+    hours_opts = get_hours_opts(qs)
+    dates_opts = get_dates_opts(qs)
     return render(request, 'dashboard/admin_list.html', {
         'items': qs,
         'barbers': obter_barbers_keys(),
@@ -78,29 +81,63 @@ def admin_finance(request):
     })
 
 
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            remember = request.POST.get('remember')
-            if remember == 'on':
-                request.session.set_expiry(60*60*24*30)
-            else:
-                request.session.set_expiry(0)
-            next_url = request.GET.get('next') or 'admin_list'
-            return redirect(next_url)
-        return render(request, 'dashboard/login.html', {'error': 'Credenciais inválidas'})
-    if request.user.is_authenticated:
-        return redirect('admin_list')
-    return render(request, 'dashboard/login.html')
+class LoginView(View):
+    # Exibe o formulário de login ou redireciona se já autenticado
+    def get(self, request):
+        if self._is_authenticated(request):
+            return redirect('admin_list')
+        return self._render_login(request)
+
+    # Processa o envio do formulário de login
+    def post(self, request):
+        username, password = self._extract_credentials(request)
+        user = self._authenticate_user(request, username, password)
+        if user:
+            self._login_user(request, user)
+            self._apply_remember_me(request)
+            return self._redirect_next(request)
+        return self._render_login(request, error='Credenciais inválidas')
+
+    # Verifica se o usuário já está autenticado
+    def _is_authenticated(self, request):
+        return request.user.is_authenticated
+
+    # Extrai credenciais do POST
+    def _extract_credentials(self, request):
+        return request.POST.get('username'), request.POST.get('password')
+
+    # Tenta autenticar o usuário com Django
+    def _authenticate_user(self, request, username, password):
+        return authenticate(request, username=username, password=password)
+
+    # Realiza o login do usuário
+    def _login_user(self, request, user):
+        login(request, user)
+
+    # Ajusta o tempo de expiração da sessão conforme "remember"
+    def _apply_remember_me(self, request):
+        remember = request.POST.get('remember')
+        if remember == 'on':
+            request.session.set_expiry(60 * 60 * 24 * 30)  # 30 dias
+        else:
+            request.session.set_expiry(0)  # expira ao fechar o navegador
+
+    # Redireciona para a próxima URL ou para o dashboard
+    def _redirect_next(self, request):
+        next_url = request.GET.get('next') or 'admin_list'
+        return redirect(next_url)
+
+    # Renderiza a página de login com possível erro
+    def _render_login(self, request, error=None):
+        context = {'error': error} if error else {}
+        return render(request, 'dashboard/login.html', context)
 
 
-def logout_view(request):
-    logout(request)
-    return redirect('login')
+    # Efetua logout e redireciona para a página de login
+    @staticmethod
+    def logout(request):
+        django_logout(request)
+        return redirect('login')
 
 
 @login_required(login_url='login')
@@ -139,6 +176,18 @@ def admin_shift_hour(request, appointment_id, direction):
     ap.rescheduled = True
     # Salva apenas os campos modificados para eficiência
     ap.save(update_fields=['hour', 'rescheduled'])
+
+    # Envia mensagem ao cliente informando o novo horário
+    try:
+        phone_digits = PhoneValidator.extract_digits(ap.client_phone)
+        if phone_digits and len(phone_digits) == 10:
+            
+            date_str = ap.date.strftime('%d/%m/%Y')
+            hour_str = new_hour.strftime('%H:%M')
+            text = f"Olá, {ap.client_name}! Seu horário com {ap.barber} foi alterado para {date_str} às {hour_str}."
+            send_mensage(phone_digits, text)
+    except Exception:
+        pass
 
     # Informa sucesso e retorna para a página de detalhes
     messages.success(request, 'Agendamento movido com sucesso')

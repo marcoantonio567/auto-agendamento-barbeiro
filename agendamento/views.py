@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
 from barbearia.helpers.infos import SERVICES, BARBERS
-from barbearia.helpers.datas import sete_dias_futuros, converter_str_para_date, converter_str_para_day_e_hora
+from barbearia.helpers.datas import get_future_days, convert_str_to_date, convert_str_to_day_and_hour
 from barbearia.helpers.disponibilidade import available_hours_for_day, horario_ja_ocupado, horarios_disponiveis_response
 from barbearia.helpers.validacao import dia_e_hora_validos , verificar_step
-from barbearia.helpers.fluxo import criar_agendamento_e_redirecionar, obter_dados_step_client
+from barbearia.helpers.phone_validation import PhoneValidator
+from barbearia.helpers.fluxo import criar_agendamento_e_redirecionar, get_datas_step_client
 
 @require_http_methods(["GET","POST"])
 def step_service(request):
@@ -37,7 +38,7 @@ def step_date(request):
     if request.method == 'POST':
         request.session['date'] = request.POST.get('date')
         return redirect('step_hour')
-    days = sete_dias_futuros()
+    days = get_future_days()
     return render(request, 'agendamento/step_date.html', {'days': days, 'back_url': 'step_barber'})
 
 def step_hour(request):
@@ -49,7 +50,7 @@ def step_hour(request):
     verificar_step(request, 'date')
     barber = request.session.get('barber')
     date_str = request.session.get('date')
-    day = converter_str_para_date(date_str)
+    day = convert_str_to_date(date_str)
     hours = available_hours_for_day(barber, day)
     if request.method == 'POST':
         request.session['hour'] = request.POST.get('hour')
@@ -63,11 +64,13 @@ def step_client(request):
     cria o agendamento (Appointment), limpa a sessão e redireciona para pagamento."""
     verificar_step(request, 'hour')
     if request.method == 'POST':
-        data = obter_dados_step_client(request)
+        data = get_datas_step_client(request)
         if not data:
             return HttpResponseBadRequest()
         client_name, client_phone, service, barber, date_str, hour_str = data
-        day, hr = converter_str_para_day_e_hora(date_str, hour_str)
+        if not PhoneValidator.is_valid_brazil_number(client_phone):
+            return HttpResponseBadRequest()
+        day, hr = convert_str_to_day_and_hour(date_str, hour_str)
         if not dia_e_hora_validos(day, hr):
             return HttpResponseBadRequest()
         if horario_ja_ocupado(barber, day, hr):
