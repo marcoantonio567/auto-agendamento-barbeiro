@@ -3,7 +3,7 @@ from django.http import Http404
 from django.core.signing import Signer, BadSignature
 from agendamento.models import Appointment
 from django.shortcuts import get_object_or_404
-from barbearia.helpers.datas import converter_str_para_date, converter_str_para_time
+from barbearia.helpers.datas import convert_str_to_date, convert_str_to_time
 from datetime import time, date, datetime
 from django.db.models import Q
 
@@ -41,21 +41,26 @@ def get_appointment_by_sid_or_404(sid):
         raise Http404
     return get_object_or_404(Appointment, pk=ap_id)
 
-def listar_agendamentos_filtrados(barber, day_str, hour_str):
+def list_filtered_appointments(barber, day_str, hour_str):
+    """
+    Retorna os agendamentos futuros ou do dia/hora atual em diante,
+    podendo filtrar por barbeiro, dia e/ou hora.
+    """
     qs = Appointment.objects.all().order_by('date', 'hour', 'barber')
     today = date.today()
     now_time = datetime.now().time()
+    # Apenas agendamentos a partir de agora
     qs = qs.filter(Q(date__gt=today) | Q(date=today, hour__gte=now_time))
     if barber:
         qs = qs.filter(barber=barber)
     if day_str:
-        day = converter_str_para_date(day_str)
+        day = convert_str_to_date(day_str)
         if day:
             qs = qs.filter(date=day)
     if hour_str:
         try:
             if ':' in hour_str:
-                hr = converter_str_para_time(hour_str)
+                hr = convert_str_to_time(hour_str)
                 qs = qs.filter(hour=hr)
             else:
                 h = int(hour_str)
@@ -68,3 +73,15 @@ def listar_agendamentos_filtrados(barber, day_str, hour_str):
         except Exception:
             pass
     return qs
+
+def get_hours_opts(qs):
+    """
+    Retorna as opções de horas únicas a partir de um QuerySet de agendamentos.
+    """
+    return sorted({h.hour for h in qs.values_list('hour', flat=True)})
+
+def get_dates_opts(qs):
+    """
+    Retorna as opções de datas únicas a partir de um QuerySet de agendamentos.
+    """
+    return list(qs.order_by('date').values_list('date', flat=True).distinct())
