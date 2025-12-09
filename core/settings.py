@@ -12,32 +12,27 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-ENV_FILE = BASE_DIR / '.env'
-if ENV_FILE.exists():
-    for _line in ENV_FILE.read_text().splitlines():
-        _line = _line.strip()
-        if not _line or _line.startswith('#'):
-            continue
-        if '=' in _line:
-            _k, _v = _line.split('=', 1)
-            os.environ.setdefault(_k.strip(), _v.strip())
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_v972$d$8gozcoki8vz$e3mlpko1)djx5_v5#g2%+p#ls#ba@2'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-
-
+ALLOWED_HOSTS = [
+    "72.62.4.161",
+    "localhost",
+    "127.0.0.1",
+    "barbershop-app",
+    "nginx",
+    "evolution_api"
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -96,6 +91,13 @@ DATABASES = {
 }
 
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://72.62.4.161:8080",
+    "http://72.62.4.161:8000",
+    "http://localhost:8080",
+    "http://localhost:8000",
+    "http://72.62.4.161",
+]
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -132,6 +134,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'core' / 'static', BASE_DIR / 'scheduling' / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 ADMIN_BASIC_USER = 'admin'
 ADMIN_BASIC_PASSWORD = 'admin'
@@ -142,6 +147,10 @@ LOGIN_REDIRECT_URL = '/admin/dashboard/'
 # Self-service access token
 SELF_SERVICE_TOKEN_KEY = os.environ.get('SELF_SERVICE_TOKEN_KEY')
 REQUIRE_SELF_SERVICE_TOKEN = os.environ.get('REQUIRE_SELF_SERVICE_TOKEN', '0').lower() in {'1', 'true', 'yes'}
+
+# External services
+EVOLUTION_API_URL = os.environ.get('EVOLUTION_API_URL', 'http://localhost:8082')
+EVOLUTION_API_KEY = os.environ.get('EVOLUTION_API_KEY')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

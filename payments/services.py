@@ -22,6 +22,7 @@ class AbacatePayService:
         payload = {
             "amount": amount_cents,
             "description": description or "Pagamento",
+            "expiresIn": 900,
             "metadata": metadata or {},
         }
         print("[AbacatePayService.gerar_qrcode] url:", f"{self.base_url}/pixQrCode/create")

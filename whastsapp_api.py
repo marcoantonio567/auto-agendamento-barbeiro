@@ -1,11 +1,11 @@
 import os
 from django.conf import settings
-
+from decouple import config
 
 def send_mensage(number: str, text: str):
     import requests
-    base_url = getattr(settings, 'EVOLUTION_API_URL', 'http://localhost:8082')
-    api_key = getattr(settings, 'EVOLUTION_API_KEY', os.getenv('AUTHENTICATION_API_KEY', ''))
+    base_url = config('EVOLUTION_API_URL', default='http://localhost:8082')
+    api_key = config('EVOLUTION_API_KEY', default='')
     url = base_url.rstrip('/') + "/message/sendText/main_phone"
     DEFAULT_COUNTRY_CODE = "55"
     payload = {
