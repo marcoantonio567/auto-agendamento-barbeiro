@@ -1,0 +1,43 @@
+{% extends 'scheduling/base.html' %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'payments/css/pagamento.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="payment success">
+    <div class="success-header">
+        <span class="icon-check">✔</span>
+        <h2>Pagamento Confirmado</h2>
+        <p class="subtitle">O registro do pagamento foi concluído com sucesso.</p>
+    </div>
+
+    <div class="card ap-card enhanced-card">
+        <h3 class="card-title">Detalhes do Agendamento</h3>
+
+        <div class="details-grid">
+            <p><strong>Cliente:</strong> {{ ap.client_name }}</p>
+            <p><strong>Telefone:</strong> {{ ap.client_phone }}</p>
+            <p><strong>Serviço:</strong> {{ ap.service_label }} — R${{ ap.price }}</p>
+            <p><strong>Barbeiro:</strong> {{ ap.barber }}</p>
+            <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} às {{ ap.hour|time:'H:i' }}</p>
+            <p><strong>Status:</strong> {{ ap.get_payment_status_display }}</p>
+        </div>
+    </div>
+
+    <div class="actions payment-actions">
+        <a href="/" class="btn-primary">Voltar ao Início</a>
+    </div>
+</section>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        history.replaceState(null, '', location.href);
+        window.addEventListener('popstate', function () {
+            window.location.href = '/';
+        });
+    } catch (e) {}
+});
+</script>
+{% endblock %}

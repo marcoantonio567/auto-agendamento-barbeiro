@@ -66,14 +66,14 @@
     </div>
     {% endif %}
 
-    <!-- Ações -->
+    {% if not qr.ok and ap.payment_status != 'pago' %}
     <div class="actions payment-actions">
         <form method="post" action="{% url 'pagamento_confirmar' sid %}">
             {% csrf_token %}
-            <button type="submit" class="btn-primary">Pagar</button>
+            <button type="submit" class="btn-primary">Gerar Pagamento</button>
         </form>
-
     </div>
+    {% endif %}
 
     <p class="muted"><a href="/">Voltar</a></p>
 
@@ -154,8 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const res = await fetch(checkUrl, { cache: 'no-store' });
                 const data = await res.json();
                 if (data && data.paid) {
-                    alert('Pagamento confirmado!');
-                    window.location.href = "{% url 'pagamento' sid %}";
+                    window.location.href = "{% url 'pagamento_sucesso' sid %}";
                 }
             } catch (e) {}
         };

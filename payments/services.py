@@ -103,6 +103,7 @@ class AbacatePayService:
             print("[AbacatePayService.checar_qrcode] response_keys:", list(wrapper.keys()) if isinstance(wrapper, dict) else type(wrapper))
 
             if isinstance(wrapper, dict) and wrapper.get("error"):
+                print("[AbacatePayService.checar_qrcode] error:", wrapper.get("error"))
                 return {"ok": False, "error": wrapper.get("error")}
 
             data = wrapper.get("data") if isinstance(wrapper, dict) else None
@@ -112,7 +113,7 @@ class AbacatePayService:
             status = str((data or {}).get("status") or "").lower()
             paid_flag = (data or {}).get("paid")
             paid = bool(paid_flag) or status in {"paid", "pago", "confirmed", "confirmado", "approved"}
-
+            print("[AbacatePayService.checar_qrcode] paid:", paid)
             return {
                 "ok": True,
                 "paid": paid,

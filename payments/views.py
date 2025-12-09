@@ -8,12 +8,21 @@ from django.http import JsonResponse
 @require_http_methods(["GET"])
 def pagamento(request, sid):
     ap = get_appointment_by_sid_or_404(sid)
+    if ap.payment_status == 'pago':
+        try:
+            del request.session[f"qr_{sid}"]
+        except Exception:
+            pass
+        return redirect('pagamento_sucesso', sid=sid)
     print("[pagamento] sid:", sid)
     print("[pagamento] service:", ap.service, "price:", ap.price())
     print("[pagamento] client:", ap.client_name, "phone:", ap.client_phone)
     print("[pagamento] barber:", ap.barber, "date:", ap.date, "hour:", ap.hour)
     qr = request.session.get(f"qr_{sid}") or {"ok": False}
-    return render(request, 'payments/pagamento.html', {'ap': ap, 'sid': sid, 'qr': qr})
+    resp = render(request, 'payments/pagamento.html', {'ap': ap, 'sid': sid, 'qr': qr})
+    resp['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    resp['Pragma'] = 'no-cache'
+    return resp
 
 
 @require_http_methods(["POST"])
@@ -69,3 +78,12 @@ def pagamento_check(request, sid):
             pass
         return JsonResponse({"ok": True, "paid": True, "status": result.get("status")})
     return JsonResponse({"ok": bool(result.get("ok")), "paid": False, "status": result.get("status"), "error": result.get("error")})
+
+
+@require_http_methods(["GET"])
+def pagamento_sucesso(request, sid):
+    ap = get_appointment_by_sid_or_404(sid)
+    resp = render(request, 'payments/sucesso.html', {'ap': ap, 'sid': sid})
+    resp['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    resp['Pragma'] = 'no-cache'
+    return resp
