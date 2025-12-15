@@ -4,6 +4,7 @@ from django.views.decorators.http import require_http_methods
 from django.conf import settings
 from core.helpers.self_service_token import validar_token
 from core.helpers.infos import SERVICES, BARBERS
+import random
 from core.helpers.datas import get_future_days, convert_str_to_date, convert_str_to_day_and_hour
 from core.helpers.disponibilidade import available_hours_for_day, horario_ja_ocupado, horarios_disponiveis_response
 from core.helpers.validacao import dia_e_hora_validos , verificar_step
@@ -23,7 +24,10 @@ def step_service(request):
 def step_barber(request):
     verificar_step(request, 'service')
     if request.method == 'POST':
-        request.session['barber'] = request.POST.get('barber')
+        choice = request.POST.get('barber')
+        if choice == 'ANY':
+            choice = random.choice([b['key'] for b in BARBERS])
+        request.session['barber'] = choice
         return redirect('step_date')
     return render(request, 'scheduling/step_barber.html', {'barbers': BARBERS, 'back_url': 'step_service'})
 

@@ -19,6 +19,13 @@
                 <span class="option-title">{{ b.name }}</span>
             </label>
             {% endfor %}
+            <label class="option-card">
+                <input type="radio" name="barber" value="ANY" required />
+                <span class="option-icon" aria-hidden="true">
+                    <i data-lucide="shuffle"></i>
+                </span>
+                <span class="option-title">Sem preferência</span>
+            </label>
         </div>
     </form>
 </section>
