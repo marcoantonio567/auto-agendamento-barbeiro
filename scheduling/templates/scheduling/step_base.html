@@ -8,12 +8,13 @@
     <link rel="stylesheet" href="{% static 'scheduling/css/base.css' %}" />
     <link rel="stylesheet" href="{% static 'scheduling/css/components.css' %}" />
     <link rel="stylesheet" href="{% static 'scheduling/css/steps.css' %}" />
+    <link rel="stylesheet" href="{% static 'scheduling/css/background.css' %}" />
     <link rel="icon" href="{% static 'scheduling/img/icon.svg' %}" type="image/svg+xml" />
     <link rel="preconnect" href="https://unpkg.com" />
     {% block styles %}{% endblock %}
     <link rel="stylesheet" href="https://unpkg.com/lucide@latest/font/lucide.css" />
 </head>
-<body>
+<body class="app-background">
     <header class="topbar">
         <h1>Barbearia</h1>
         {% if back_url %}
