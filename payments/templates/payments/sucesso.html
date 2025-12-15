@@ -28,6 +28,7 @@
             <p><strong>Barbeiro:</strong> {{ ap.barber }}</p>
             <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} às {{ ap.hour|time:'H:i' }}</p>
             <p><strong>Status:</strong> {{ ap.get_payment_status_display }}</p>
+            <p><strong>Forma de pagamento:</strong> {% if ap.payment_status == 'pago' %}Pix{% else %}Na hora{% endif %}</p>
         </div>
     </div>
 
