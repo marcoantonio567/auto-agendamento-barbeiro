@@ -22,6 +22,7 @@ class PhoneValidator:
 
     @staticmethod
     def extract_digits(value: str) -> str:
+        """Extrai dígitos removendo não-numéricos e descarta '9' logo após o DDD."""
         raw = ''.join(ch for ch in (value or '') if ch.isdigit())
         if len(raw) >= 3 and raw[2] == '9':
             return raw[:2] + raw[3:]
@@ -29,28 +30,34 @@ class PhoneValidator:
 
     @staticmethod
     def extract_raw_digits(value: str) -> str:
+        """Extrai somente os dígitos do valor informado."""
         return ''.join(ch for ch in (value or '') if ch.isdigit())
 
     @staticmethod
     def contains_only_numbers(value: str) -> bool:
+        """Verifica se o valor contém apenas números."""
         return (value or '').isdigit()
 
     @classmethod
     def has_correct_length(cls, value: str) -> bool:
+        """Verifica se há exatamente 11 dígitos após a extração."""
         return len(cls.extract_raw_digits(value)) == 11
 
     @classmethod
     def is_valid_ddd(cls, value: str) -> bool:
+        """Verifica se o DDD extraído está na lista de DDDs válidos."""
         digits = cls.extract_raw_digits(value)
         ddd = digits[:2] if len(digits) >= 2 else ''
         return ddd in cls.VALID_DDD
 
     @staticmethod
     def matches_br_format(value: str) -> bool:
+        """Valida se o formato corresponde a '(DD) 9 9999-9999'."""
         return bool(re.fullmatch(r"\(\d{2}\)\s9\s?\d{4}-\d{4}", (value or '')))
 
     @classmethod
     def is_valid_brazil_number(cls, value: str) -> bool:
+        """Valida número brasileiro com DDD válido e dígito '9' após o DDD."""
         digits = cls.extract_raw_digits(value)
         if len(digits) != 11:
             return False
@@ -62,6 +69,7 @@ class PhoneValidator:
 
     @classmethod
     def diagnostics(cls, value: str) -> Dict[str, bool]:
+        """Retorna um dicionário com diagnósticos de validação do telefone."""
         return {
             'only_numbers': cls.contains_only_numbers(value),
             'correct_length': cls.has_correct_length(value),

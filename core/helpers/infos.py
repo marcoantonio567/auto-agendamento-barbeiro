@@ -45,4 +45,5 @@ BARBERS = [
 ]
 
 def obter_barbers_keys():
+    """Retorna lista de chaves dos barbeiros disponíveis."""
     return [b['key'] for b in BARBERS]

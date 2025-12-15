@@ -8,6 +8,7 @@ from datetime import time, date, datetime
 from django.db.models import Q
 
 def criar_agendamento_e_redirecionar(request, client_name, client_phone, service, barber, day, hr):
+    """Cria `Appointment`, limpa sessão e redireciona para pagamento."""
     ap = Appointment.objects.create(
         client_name=client_name,
         client_phone=client_phone,
@@ -21,6 +22,7 @@ def criar_agendamento_e_redirecionar(request, client_name, client_phone, service
     return redirect('pagamento', sid=sid)
 
 def get_datas_step_client(request):
+    """Obtém dados do cliente da sessão/POST; retorna tupla ou `None`."""
     client_name = request.POST.get('client_name')
     client_phone = request.POST.get('client_phone')
     service = request.session.get('service')
@@ -32,6 +34,7 @@ def get_datas_step_client(request):
     return client_name, client_phone, service, barber, date_str, hour_str
 
 def get_appointment_by_sid_or_404(sid):
+    """Desassina `sid` e retorna `Appointment` ou dispara `Http404`."""
     try:
         ap_id = Signer().unsign(sid)
     except BadSignature:
@@ -39,6 +42,7 @@ def get_appointment_by_sid_or_404(sid):
     return get_object_or_404(Appointment, pk=ap_id)
 
 def list_filtered_appointments(barber, day_str, hour_str):
+    """Lista agendamentos futuros filtrando por barbeiro, data e/ou hora."""
     qs = Appointment.objects.all().order_by('date', 'hour', 'barber')
     today = date.today()
     now_time = datetime.now().time()
@@ -67,7 +71,9 @@ def list_filtered_appointments(barber, day_str, hour_str):
     return qs
 
 def get_hours_opts(qs):
+    """Retorna lista ordenada de horas (inteiro) presentes no queryset."""
     return sorted({h.hour for h in qs.values_list('hour', flat=True)})
 
 def get_dates_opts(qs):
+    """Retorna lista distinta de datas ordenadas presentes no queryset."""
     return list(qs.order_by('date').values_list('date', flat=True).distinct())

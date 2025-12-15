@@ -14,6 +14,7 @@ except Exception:  # pragma: no cover
 
 
 def _get_fernet() -> Fernet:
+    """Obtém uma instância `Fernet` baseada em `SELF_SERVICE_TOKEN_KEY` ou `SECRET_KEY`."""
     if Fernet is None:
         raise RuntimeError("cryptography/Fernet não disponível. Instale a dependência.")
     key = getattr(settings, "SELF_SERVICE_TOKEN_KEY", None)
@@ -31,6 +32,7 @@ def _get_fernet() -> Fernet:
 
 
 def gerar_token(payload: Dict[str, Any], ttl_segundos: int = 15 * 60) -> str:
+    """Gera token criptografado com campos `iat` e `exp` usando Fernet."""
     agora = int(time.time())
     data = {**payload, "iat": agora, "exp": agora + ttl_segundos}
     texto = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
@@ -38,6 +40,7 @@ def gerar_token(payload: Dict[str, Any], ttl_segundos: int = 15 * 60) -> str:
 
 
 def validar_token(token: str) -> Optional[Dict[str, Any]]:
+    """Valida o token Fernet e retorna o payload se não expirado; caso contrário `None`."""
     try:
         texto = _get_fernet().decrypt(token.encode("utf-8"))
         data = json.loads(texto.decode("utf-8"))
