@@ -9,8 +9,13 @@
 <section class="payment success">
     <div class="success-header">
         <span class="icon-check">✔</span>
+        {% if ap.payment_status == 'pago' %}
         <h2>Pagamento Confirmado</h2>
         <p class="subtitle">O registro do pagamento foi concluído com sucesso.</p>
+        {% else %}
+        <h2>Agendamento Confirmado</h2>
+        <p class="subtitle">Pagamento será realizado na hora do atendimento.</p>
+        {% endif %}
     </div>
 
     <div class="card ap-card enhanced-card">

@@ -66,11 +66,15 @@
     </div>
     {% endif %}
 
-    {% if not qr.ok and ap.payment_status != 'pago' %}
+    {% if ap.payment_status != 'pago' and not qr.ok %}
     <div class="actions payment-actions">
         <form method="post" action="{% url 'pagamento_confirmar' sid %}">
             {% csrf_token %}
-            <button type="submit" class="btn-primary">Gerar Pagamento</button>
+            <button type="submit" class="btn-primary">Pagar agora com PIX</button>
+        </form>
+        <form method="post" action="{% url 'pagamento_na_hora' sid %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-secondary">Pagar na hora (no balcão)</button>
         </form>
     </div>
     {% endif %}

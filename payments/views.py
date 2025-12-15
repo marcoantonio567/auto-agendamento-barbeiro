@@ -47,6 +47,20 @@ def pagamento_confirmar(request, sid):
         ap.save(update_fields=["payment_status"])
     return redirect('pagamento', sid=sid)
 
+@require_http_methods(["POST"])
+def pagamento_na_hora(request, sid):
+    ap = get_appointment_by_sid_or_404(sid)
+    print("[pagamento_na_hora] sid:", sid)
+    print("[pagamento_na_hora] current_status:", ap.payment_status)
+    if ap.payment_status != 'pago':
+        ap.payment_status = 'pendente'
+        ap.save(update_fields=["payment_status"])
+    try:
+        del request.session[f"qr_{sid}"]
+    except Exception:
+        pass
+    print("[pagamento_na_hora] new_status:", ap.payment_status)
+    return redirect('pagamento_sucesso', sid=sid)
 
 @require_http_methods(["POST"])
 def pagamento_falhar(request, sid):
