@@ -25,7 +25,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Data</th><th>Cliente</th><th>Serviço</th><th>Barbeiro</th><th>Valor</th>
+                <th>Data</th><th>Cliente</th><th>Serviço</th><th>Barbeiro</th><th>Valor</th><th>Forma de pagamento</th>
             </tr>
         </thead>
         <tbody>
@@ -36,9 +36,10 @@
                 <td>{{ ap.service_label }}</td>
                 <td>{{ ap.barber }}</td>
                 <td>R${% if ap.service == 'combo' %}100{% else %}50{% endif %}</td>
+                <td>{% if ap.payment_status == 'pago' %}Pix{% else %}Na hora{% endif %}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="5">Nenhum pagamento concluído</td></tr>
+            <tr><td colspan="6">Nenhum pagamento concluído</td></tr>
             {% endfor %}
         </tbody>
     </table>

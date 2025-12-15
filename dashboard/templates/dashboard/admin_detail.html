@@ -13,6 +13,7 @@
         <p><strong>Barbeiro:</strong> {{ ap.barber }}</p>
         <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} {{ ap.hour|time:'H:i' }}</p>
         <p><strong>Status de pagamento:</strong> {{ ap.get_payment_status_display }}</p>
+        <p><strong>Forma de pagamento:</strong> {% if ap.payment_status == 'pago' %}Pix{% else %}dinheiro{% endif %}</p>
         <p><strong>Horário alterado:</strong> {% if ap.rescheduled %}Sim{% else %}Não{% endif %}</p>
     </div>
     <div class="actions">
