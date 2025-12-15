@@ -6,6 +6,7 @@ from core.helpers.self_service_token import validar_token
 from core.helpers.infos import SERVICES, BARBERS
 import random
 from core.helpers.datas import get_future_days, convert_str_to_date, convert_str_to_day_and_hour
+from datetime import date as ddate, timedelta
 from core.helpers.disponibilidade import available_hours_for_day, horario_ja_ocupado, horarios_disponiveis_response
 from core.helpers.validacao import dia_e_hora_validos , verificar_step
 from core.helpers.phone_validation import PhoneValidator
@@ -37,7 +38,7 @@ def step_date(request):
         request.session['date'] = request.POST.get('date')
         return redirect('step_hour')
     days = get_future_days()
-    return render(request, 'scheduling/step_date.html', {'days': days, 'back_url': 'step_barber'})
+    return render(request, 'scheduling/step_date.html', {'days': days, 'back_url': 'step_barber', 'today': ddate.today(), 'tomorrow': ddate.today() + timedelta(days=1)})
 
 def step_hour(request):
     verificar_step(request, 'date')

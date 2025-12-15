@@ -2,8 +2,14 @@ from datetime import date as ddate, datetime, timedelta
 from django.http import HttpResponseBadRequest, JsonResponse
 
 def get_future_days():
-    """Retorna uma lista com os próximos 8 dias a partir de hoje."""
-    return [(ddate.today() + timedelta(days=i)) for i in range(0, 8)]
+    """Retorna uma lista com os próximos 8 dias a partir de hoje. com domingo excluído."""
+    days = []
+    cur = ddate.today()
+    while len(days) < 8:
+        if cur.weekday() != 6:
+            days.append(cur)
+        cur += timedelta(days=1)
+    return days
 
 def convert_str_to_date(date_str):
     """Converte 'YYYY-MM-DD' em `date`; retorna `None` se inválido."""
