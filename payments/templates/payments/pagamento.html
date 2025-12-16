@@ -77,10 +77,16 @@
 
     {% if ap.payment_status != 'pago' and not qr.ok %}
     <div class="actions payment-actions">
+        <!--
         <form method="post" action="{% url 'pagamento_confirmar' sid %}">
             {% csrf_token %}
             <button type="submit" class="btn-primary">Pagar agora com PIX</button>
         </form>
+        -->
+        <button type="button" class="btn-primary" disabled style="background-color: #6c757d; cursor: not-allowed; opacity: 0.7;">
+            PIX (Em manutenção)
+        </button>
+
         <form method="post" action="{% url 'pagamento_na_hora' sid %}">
             {% csrf_token %}
             <button type="submit" class="btn-secondary">Pagar na hora (no balcão)</button>
