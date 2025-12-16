@@ -150,7 +150,8 @@ REQUIRE_SELF_SERVICE_TOKEN = os.environ.get('REQUIRE_SELF_SERVICE_TOKEN', '0').l
 
 # External services
 EVOLUTION_API_URL = os.environ.get('EVOLUTION_API_URL', 'http://localhost:8082')
-EVOLUTION_API_KEY = os.environ.get('EVOLUTION_API_KEY')
+EVOLUTION_API_KEY = os.environ.get('EVOLUTION_API_KEY', 'rtdlb23ny2y7cos6s988g')
+AUTHENTICATION_API_KEY = os.environ.get('AUTHENTICATION_API_KEY', '162636')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
