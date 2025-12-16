@@ -26,22 +26,7 @@ BARBERS = [
         'key': 'Japa',
         'name': 'Japa',
         'photo': '/static/scheduling/img/barbers/japa.svg',
-    },
-    {
-        'key': 'João',
-        'name': 'João',
-        'photo': '/static/scheduling/img/barbers/joao.svg',
-    },
-    {
-        'key': 'Marco',
-        'name': 'Marco',
-        'photo': '/static/scheduling/img/barbers/marco.svg',
-    },
-    {
-        'key': 'Daniel',
-        'name': 'Daniel',
-        'photo': '/static/scheduling/img/barbers/daniel.svg',
-    },
+    }
 ]
 
 def obter_barbers_keys():

@@ -9,9 +9,6 @@ class Appointment(models.Model):
     ]
     BARBER_CHOICES = [
         ('Japa', 'Japa'),
-        ('João', 'João'),
-        ('Marco', 'Marco'),
-        ('Daniel', 'Daniel'),
     ]
     PAYMENT_CHOICES = [
         ('pendente', 'Pendente'),
