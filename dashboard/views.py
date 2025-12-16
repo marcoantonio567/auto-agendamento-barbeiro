@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout as django_logout
 from django.views import View
+from django.http import JsonResponse
 from scheduling.models import Appointment
 from core.helpers.infos import obter_barbers_keys
+from django.views.decorators.http import require_http_methods
 from core.helpers.fluxo import list_filtered_appointments, get_hours_opts, get_dates_opts
 from datetime import date, timedelta, datetime
 from django.db.models import Q
@@ -67,16 +69,14 @@ def admin_history(request):
 def admin_finance(request):
     all_qs = Appointment.objects.all()
     pagos = all_qs.filter(payment_status='pago')
-    pendentes = all_qs.filter(payment_status='pendente')
-    falhos = all_qs.filter(payment_status='falhou')
-    total_pago = sum(100 if ap.service == 'combo' else 50 for ap in pagos)
-    total_pendente = sum(100 if ap.service == 'combo' else 50 for ap in pendentes)
-    total_falhou = sum(100 if ap.service == 'combo' else 50 for ap in falhos)
+    virtual = pagos.filter(payment_method='pix')
+    fisico = pagos.filter(payment_method='cash')
+    total_virtual = sum(100 if ap.service == 'combo' else 50 for ap in virtual)
+    total_fisico = sum(100 if ap.service == 'combo' else 50 for ap in fisico)
     return render(request, 'dashboard/admin_finance.html', {
         'pagos': pagos.order_by('-date', '-hour'),
-        'total_pago': total_pago,
-        'total_pendente': total_pendente,
-        'total_falhou': total_falhou,
+        'total_virtual': total_virtual,
+        'total_fisico': total_fisico,
         'is_painel': True,
     })
 
@@ -177,18 +177,50 @@ def admin_shift_hour(request, appointment_id, direction):
     # Salva apenas os campos modificados para eficiência
     ap.save(update_fields=['hour', 'rescheduled'])
 
-    # Envia mensagem ao cliente informando o novo horário
-    try:
-        phone_digits = PhoneValidator.extract_digits(ap.client_phone)
-        if phone_digits and len(phone_digits) == 10:
-            
-            date_str = ap.date.strftime('%d/%m/%Y')
-            hour_str = new_hour.strftime('%H:%M')
-            text = f"Olá, {ap.client_name}! Seu horário com {ap.barber} foi alterado para {date_str} às {hour_str}."
-            send_mensage(phone_digits, text)
-    except Exception:
-        pass
+    # Envia mensagem ao cliente informando o novo horário e exibe feedback
+    phone_digits = PhoneValidator.extract_digits(ap.client_phone)
+    if not phone_digits or len(phone_digits) != 10:
+        messages.warning(request, 'Telefone do cliente inválido para envio de WhatsApp')
+    else:
+        date_str = ap.date.strftime('%d/%m/%Y')
+        hour_str = new_hour.strftime('%H:%M')
+        text = f"Olá, {ap.client_name}! Seu horário com {ap.barber} foi alterado para {date_str} às {hour_str}."
+        result = send_mensage(phone_digits, text)
+        if not result.get('ok'):
+            err = result.get('error') or 'erro_desconhecido'
+            details = result.get('details')
+            if details:
+                messages.error(request, f'Falha ao enviar WhatsApp: {err} ({details})')
+            else:
+                messages.error(request, f'Falha ao enviar WhatsApp: {err}')
+        else:
+            messages.success(request, 'WhatsApp enviado ao cliente')
 
     # Informa sucesso e retorna para a página de detalhes
     messages.success(request, 'Agendamento movido com sucesso')
     return redirect('admin_detail', appointment_id=ap.id)
+
+
+@login_required(login_url='login')
+@require_http_methods(["POST"])
+def admin_confirm_cash(request, appointment_id):
+    ap = get_object_or_404(Appointment, pk=appointment_id)
+    if ap.payment_method == 'cash' and ap.payment_status != 'pago':
+        ap.payment_status = 'pago'
+        ap.save(update_fields=['payment_status'])
+    return redirect('admin_detail', appointment_id=ap.id)
+
+
+@require_http_methods(["POST"])
+def whatsapp_send(request):
+    number = request.POST.get("number")
+    text = request.POST.get("text")
+    if not number or not text:
+        return JsonResponse(
+            {"ok": False, "error": "missing_params", "details": "Parâmetros 'number' e 'text' são obrigatórios"},
+            status=400
+        )
+    result = send_mensage(number, text)
+    if result.get("ok"):
+        return JsonResponse(result, status=200)
+    return JsonResponse(result, status=400)

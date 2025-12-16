@@ -23,15 +23,7 @@
             <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} {{ ap.hour|time:'H:i' }}</p>
             <p><strong>Status:</strong> {{ ap.get_payment_status_display }}</p>
             <p><strong>Horário alterado:</strong> {{ ap.rescheduled|yesno:"Sim,Não" }}</p>
-            <p><strong>Forma de pagamento:</strong>
-                {% if qr.ok %}
-                    Pix
-                {% elif ap.payment_status == 'pendente' %}
-                    Na hora
-                {% else %}
-                    —
-                {% endif %}
-            </p>
+            <p><strong>Forma de pagamento:</strong> {{ ap.get_payment_method_display }}</p>
         </div>
 
         <!-- Card: PIX -->

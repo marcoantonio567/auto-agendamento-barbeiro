@@ -10,6 +10,10 @@ class Appointment(models.Model):
     BARBER_CHOICES = [
         ('Japa', 'Japa'),
     ]
+    PAYMENT_METHOD_CHOICES = [
+        ('pix', 'Pix'),
+        ('cash', 'Dinheiro'),
+    ]
     PAYMENT_CHOICES = [
         ('pendente', 'Pendente'),
         ('pago', 'Pago'),
@@ -22,6 +26,7 @@ class Appointment(models.Model):
     date = models.DateField()
     hour = models.TimeField()
     payment_status = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default='pendente')
+    payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES, default='cash')
     rescheduled = models.BooleanField(default=False)
 
     class Meta:

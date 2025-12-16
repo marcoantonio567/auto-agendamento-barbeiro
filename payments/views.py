@@ -44,7 +44,8 @@ def pagamento_confirmar(request, sid):
     request.session[f"qr_{sid}"] = qr
     if ap.payment_status != 'pendente':
         ap.payment_status = 'pendente'
-        ap.save(update_fields=["payment_status"])
+    ap.payment_method = 'pix'
+    ap.save(update_fields=["payment_status", "payment_method"])
     return redirect('pagamento', sid=sid)
 
 @require_http_methods(["POST"])
@@ -54,7 +55,8 @@ def pagamento_na_hora(request, sid):
     print("[pagamento_na_hora] current_status:", ap.payment_status)
     if ap.payment_status != 'pago':
         ap.payment_status = 'pendente'
-        ap.save(update_fields=["payment_status"])
+    ap.payment_method = 'cash'
+    ap.save(update_fields=["payment_status", "payment_method"])
     try:
         del request.session[f"qr_{sid}"]
     except Exception:
@@ -85,7 +87,8 @@ def pagamento_check(request, sid):
     result = svc.checar_qrcode(charge_id)
     if result.get("ok") and result.get("paid"):
         ap.payment_status = 'pago'
-        ap.save(update_fields=["payment_status"])
+        ap.payment_method = 'pix'
+        ap.save(update_fields=["payment_status", "payment_method"])
         try:
             del request.session[f"qr_{sid}"]
         except Exception:

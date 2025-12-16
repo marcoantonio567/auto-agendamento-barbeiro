@@ -13,12 +13,20 @@
         <p><strong>Barbeiro:</strong> {{ ap.barber }}</p>
         <p><strong>Horário:</strong> {{ ap.date|date:'d/m/Y' }} {{ ap.hour|time:'H:i' }}</p>
         <p><strong>Status de pagamento:</strong> {{ ap.get_payment_status_display }}</p>
-        <p><strong>Forma de pagamento:</strong> {% if ap.payment_status == 'pago' %}Pix{% else %}dinheiro{% endif %}</p>
+        <p><strong>Forma de pagamento:</strong> {{ ap.get_payment_method_display }}</p>
         <p><strong>Horário alterado:</strong> {% if ap.rescheduled %}Sim{% else %}Não{% endif %}</p>
     </div>
     <div class="actions">
         <button type="button" class="btn-primary open-shift-modal">Mover horário</button>
     </div>
+    {% if ap.payment_method == 'cash' and ap.payment_status != 'pago' %}
+    <div class="actions" style="margin-top:12px">
+        <form method="post" action="{% url 'admin_confirm_cash' ap.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-secondary">Confirmar pagamento em dinheiro</button>
+        </form>
+    </div>
+    {% endif %}
     <form id="shiftForm" method="post" style="display:none">
         {% csrf_token %}
     </form>
