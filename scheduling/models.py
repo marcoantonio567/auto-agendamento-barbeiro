@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import UniqueConstraint, Q
 
 
 class Appointment(models.Model):
@@ -43,7 +44,13 @@ class Appointment(models.Model):
     cancelled_by = models.CharField(max_length=10, choices=CANCELLED_BY_CHOICES, blank=True, default='')
 
     class Meta:
-        unique_together = [('barber', 'date', 'hour', 'status')]
+        constraints = [
+            UniqueConstraint(
+                fields=['barber', 'date', 'hour'],
+                condition=Q(status='ativo'),
+                name='unique_active_appointment'
+            )
+        ]
         db_table = 'agendamento_appointment'
 
     def price(self):

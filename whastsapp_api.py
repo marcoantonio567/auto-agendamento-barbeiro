@@ -6,7 +6,7 @@ def send_mensage(number: str, text: str):
     import requests
     base_url = getattr(settings, 'EVOLUTION_API_URL', 'http://localhost:8082')
     api_key = getattr(settings, 'EVOLUTION_API_KEY', os.getenv('AUTHENTICATION_API_KEY', ''))
-    url = base_url.rstrip('/') + "/message/sendText/japa_phone"
+    url = base_url.rstrip('/') + "/message/sendText/teste"
     DEFAULT_COUNTRY_CODE = "55"
     payload = {
         "number": DEFAULT_COUNTRY_CODE + number,

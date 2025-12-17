@@ -42,3 +42,11 @@
 .shift-option.selected{background:var(--elev);border-color:var(--accent)}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end}
 .btn-secondary{padding:12px 24px;border:1px solid var(--border);border-radius:var(--radius);background:var(--elev);color:var(--text);cursor:pointer;font-weight:600}
+.btn-danger{padding:12px 24px;border:none;border-radius:var(--radius);background:linear-gradient(180deg, #ef4444, #dc2626);color:#fff;cursor:pointer;font-weight:700;box-shadow:var(--shadow-md);transition:transform .08s ease, filter .15s ease, box-shadow .15s ease}
+.btn-danger:hover{filter:brightness(0.95);box-shadow:0 6px 18px rgba(220,38,38,.3)}
+.btn-danger:active{transform:translateY(1px);filter:brightness(0.92)}
+.btn-danger:disabled{opacity:.6;cursor:not-allowed;filter:none;box-shadow:none}
+@media(max-width:600px){
+  .modal-actions{flex-wrap:wrap;justify-content:stretch}
+  .modal-actions .btn-primary,.modal-actions .btn-secondary,.modal-actions .btn-danger{flex:1;min-width:160px}
+}

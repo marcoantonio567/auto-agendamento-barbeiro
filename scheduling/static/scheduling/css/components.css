@@ -27,6 +27,11 @@ select,input[type=text],input[type=date],input[type=time]{width:100%;padding:10p
   .auth-form .form-group.checkbox-group{justify-content:flex-start;align-items:flex-start}
   .auth-form .checkbox{justify-content:flex-start}
 }
+@media(max-width:600px){
+  .actions{flex-direction:column;align-items:stretch}
+  .actions form{width:100%}
+  .actions .btn-primary,.actions .btn-secondary,.actions .btn-danger{width:100%}
+}
 .center-screen{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - var(--topbar-h));width:100%}
 .auth-card{max-width:560px;margin:0 auto}
 .auth-form .form-group{max-width:520px}

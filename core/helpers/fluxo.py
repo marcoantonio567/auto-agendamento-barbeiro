@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 from core.helpers.datas import convert_str_to_date, convert_str_to_time
 from datetime import time, date, datetime
 from django.db.models import Q
+from core.helpers.phone_validation import PhoneValidator
+from whastsapp_api import send_mensage
 
 def criar_agendamento_e_redirecionar(request, client_name, client_phone, service, barber, day, hr):
     """Cria `Appointment`, limpa sessão e redireciona para pagamento."""
@@ -17,6 +19,15 @@ def criar_agendamento_e_redirecionar(request, client_name, client_phone, service
         date=day,
         hour=hr,
     )
+    phone_digits = PhoneValidator.extract_digits(client_phone)
+    if phone_digits and len(phone_digits) == 10:
+        date_str = day.strftime('%d/%m/%Y')
+        hour_str = hr.strftime('%H:%M')
+        text = f"Olá, {client_name}! Seu agendamento com {barber} foi confirmado para {date_str} às {hour_str}."
+        try:
+            send_mensage(phone_digits, text)
+        except Exception:
+            pass
     request.session.flush()
     sid = Signer().sign(ap.id)
     return redirect('pagamento', sid=sid)
