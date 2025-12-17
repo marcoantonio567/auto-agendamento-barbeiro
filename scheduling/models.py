@@ -42,6 +42,7 @@ class Appointment(models.Model):
     cancel_reason = models.CharField(max_length=255, blank=True, default='')
     cancelled_at = models.DateTimeField(null=True, blank=True)
     cancelled_by = models.CharField(max_length=10, choices=CANCELLED_BY_CHOICES, blank=True, default='')
+    reminder_sent = models.BooleanField(default=False)
 
     class Meta:
         constraints = [

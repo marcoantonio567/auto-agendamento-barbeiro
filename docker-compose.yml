@@ -37,6 +37,28 @@ services:
       evolution-api:
         condition: service_started
     restart: unless-stopped
+  reminder-worker:
+    build: .
+    container_name: reminder-worker
+    working_dir: /app
+    command: bash -c "
+      python manage.py migrate &&
+      while true; do
+        python manage.py send_whatsapp_reminders;
+        sleep 60;
+      done
+      "
+    volumes:
+      - ./:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings
+      - EVOLUTION_API_URL=http://evolution_api:8080
+    env_file:
+      - .env
+    depends_on:
+      evolution-api:
+        condition: service_started
+    restart: unless-stopped
   nginx:
     image: nginx:stable
     container_name: nginx
