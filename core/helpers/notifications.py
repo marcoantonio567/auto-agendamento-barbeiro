@@ -1,5 +1,6 @@
 from django.contrib import messages
 from whastsapp_api import send_mensage
+from core.helpers.phone_validation import PhoneValidator
 
 
 def format_reschedule_message(appointment, new_hour):
@@ -45,3 +46,16 @@ def send_whatsapp_and_feedback(request, number, text):
             messages.error(request, f'Falha ao enviar WhatsApp: {err}')
     return result
 
+
+def notify_client_change(request, appointment, message_text):
+    """Valida telefone e envia mensagem via WhatsApp.
+    
+    - Valida se o telefone tem 10 dígitos.
+    - Envia mensagem se válido.
+    - Adiciona warning ao request se inválido.
+    """
+    phone_digits = PhoneValidator.extract_digits(appointment.client_phone)
+    if phone_digits and len(phone_digits) == 10:
+        send_whatsapp_and_feedback(request, phone_digits, message_text)
+    else:
+        messages.warning(request, 'Telefone do cliente inválido para envio de WhatsApp')

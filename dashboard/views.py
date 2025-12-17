@@ -8,13 +8,20 @@ from django.contrib import messages
 from scheduling.models import Appointment
 from core.helpers.infos import obter_barbers_keys
 from core.helpers.fluxo import list_filtered_appointments, get_hours_opts, get_dates_opts
-from core.helpers.phone_validation import PhoneValidator
 from core.helpers.history import get_past_appointments
-from core.helpers.finance import get_paid_appointments, compute_totals
+from core.helpers.finance import (
+    get_paid_appointments, 
+    compute_totals,
+    calculate_daily_revenue,
+    calculate_monthly_revenue,
+    calculate_top_services,
+    calculate_average_ticket
+)
 from core.helpers.notifications import (
     format_reschedule_message,
     format_cancel_message,
     send_whatsapp_and_feedback,
+    notify_client_change
 )
 from core.helpers.appointments import compute_new_hour, apply_hour_shift
 from datetime import date, timedelta
@@ -85,32 +92,20 @@ class AdminFinanceView(LoginRequiredMixin, View):
         # Métricas iniciais para gráficos
         today = date.today()
         start_30d = today - timedelta(days=29)
+        
         # Receita diária (últimos 30 dias)
-        daily_map = {}
-        for ap in pagos.filter(date__gte=start_30d).order_by('date'):
-            key = ap.date.strftime('%Y-%m-%d')
-            daily_map[key] = daily_map.get(key, 0) + ap.price()
-        daily_labels = sorted(daily_map.keys())
-        daily_values = [daily_map[k] for k in daily_labels]
+        daily_labels, daily_values = calculate_daily_revenue(pagos.filter(date__gte=start_30d))
+        
         # Receita mensal (últimos 12 meses)
         start_12m = (today.replace(day=1) - timedelta(days=365))
-        monthly_map = {}
-        for ap in pagos.filter(date__gte=start_12m).order_by('date'):
-            key = f"{ap.date.year}-{ap.date.month:02d}"
-            monthly_map[key] = monthly_map.get(key, 0) + ap.price()
-        monthly_labels = sorted(monthly_map.keys())
-        monthly_values = [monthly_map[k] for k in monthly_labels]
+        monthly_labels, monthly_values = calculate_monthly_revenue(pagos.filter(date__gte=start_12m))
+        
         # Top serviços por receita
-        service_map = {'barba': 0, 'cabelo': 0, 'combo': 0}
-        for ap in pagos:
-            service_map[ap.service] = service_map.get(ap.service, 0) + ap.price()
-        service_labels = ['barba', 'cabelo', 'combo']
-        service_values = [service_map[s] for s in service_labels]
+        service_labels, service_values = calculate_top_services(pagos)
+        
         # Ticket médio (últimos 30 dias)
-        last_30_qs = pagos.filter(date__gte=start_30d)
-        count_30 = last_30_qs.count()
-        sum_30 = sum(ap.price() for ap in last_30_qs)
-        ticket_medio = (sum_30 / count_30) if count_30 else 0
+        ticket_medio = calculate_average_ticket(pagos.filter(date__gte=start_30d))
+
         finance_init = {
             'totais_por_metodo': {
                 'labels': ['PIX', 'Dinheiro'],
@@ -162,35 +157,25 @@ class FinanceMetricsApi(LoginRequiredMixin, View):
             qs = qs.filter(payment_method=metodo)
         if servico in ('barba', 'cabelo', 'combo'):
             qs = qs.filter(service=servico)
+        
         # Recalcula métricas com base no filtro
         # Totais por método
         v_qs = qs.filter(payment_method='pix')
         f_qs = qs.filter(payment_method='cash')
         total_virtual, total_fisico = compute_totals(v_qs, f_qs)
+        
         # Receita diária
-        daily_map = {}
-        for ap in qs.order_by('date'):
-            key = ap.date.strftime('%Y-%m-%d')
-            daily_map[key] = daily_map.get(key, 0) + ap.price()
-        daily_labels = sorted(daily_map.keys())
-        daily_values = [daily_map[k] for k in daily_labels]
+        daily_labels, daily_values = calculate_daily_revenue(qs)
+        
         # Receita mensal
-        monthly_map = {}
-        for ap in qs.order_by('date'):
-            key = f"{ap.date.year}-{ap.date.month:02d}"
-            monthly_map[key] = monthly_map.get(key, 0) + ap.price()
-        monthly_labels = sorted(monthly_map.keys())
-        monthly_values = [monthly_map[k] for k in monthly_labels]
+        monthly_labels, monthly_values = calculate_monthly_revenue(qs)
+        
         # Top serviços
-        service_map = {'barba': 0, 'cabelo': 0, 'combo': 0}
-        for ap in qs:
-            service_map[ap.service] = service_map.get(ap.service, 0) + ap.price()
-        service_labels = ['barba', 'cabelo', 'combo']
-        service_values = [service_map[s] for s in service_labels]
+        service_labels, service_values = calculate_top_services(qs)
+        
         # Ticket médio
-        count = qs.count()
-        sum_total = sum(ap.price() for ap in qs)
-        ticket_medio = (sum_total / count) if count else 0
+        ticket_medio = calculate_average_ticket(qs)
+
         return JsonResponse({
             'totais_por_metodo': {
                 'labels': ['PIX', 'Dinheiro'],
@@ -294,13 +279,10 @@ class AdminShiftHourView(LoginRequiredMixin, View):
             return redirect('admin_detail', appointment_id=ap.id)
         # Aplica atualização na hora e marca como reagendado
         apply_hour_shift(ap, new_hour)
-        # Envia WhatsApp ao cliente (se telefone válido)
-        phone_digits = PhoneValidator.extract_digits(ap.client_phone)
-        if not phone_digits or len(phone_digits) != 10:
-            messages.warning(request, 'Telefone do cliente inválido para envio de WhatsApp')
-        else:
-            text = format_reschedule_message(ap, new_hour)
-            send_whatsapp_and_feedback(request, phone_digits, text)
+        # Notifica cliente via WhatsApp
+        text = format_reschedule_message(ap, new_hour)
+        notify_client_change(request, ap, text)
+        
         # Feedback de sucesso e redireciona
         messages.success(request, 'Agendamento movido com sucesso')
         return redirect('admin_detail', appointment_id=ap.id)
@@ -361,13 +343,10 @@ class AdminCancelAppointmentView(LoginRequiredMixin, View):
         ap.cancelled_at = timezone.now()
         ap.cancel_reason = reason
         ap.save(update_fields=['status', 'cancelled_by', 'cancelled_at', 'cancel_reason'])
-        # Envia WhatsApp informando cancelamento quando telefone válido
-        phone_digits = PhoneValidator.extract_digits(ap.client_phone)
-        if phone_digits and len(phone_digits) == 10:
-            text = format_cancel_message(ap, reason)
-            send_whatsapp_and_feedback(request, phone_digits, text)
-        else:
-            messages.warning(request, 'Telefone do cliente inválido para envio de WhatsApp')
+        # Notifica cliente via WhatsApp
+        text = format_cancel_message(ap, reason)
+        notify_client_change(request, ap, text)
+        
         # Feedback de sucesso e redireciona
         messages.success(request, 'Agendamento cancelado com sucesso')
         return redirect('admin_detail', appointment_id=ap.id)
