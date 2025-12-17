@@ -261,9 +261,10 @@ class LoginView(View):
 
 class AdminShiftHourView(LoginRequiredMixin, View):
     login_url = 'login'
+    http_method_names = ['post']
     """Move o horário de um agendamento em 1 hora para trás/à frente."""
 
-    def get(self, request, appointment_id, direction):
+    def post(self, request, appointment_id, direction):
         # Recupera o agendamento pelo ID ou 404
         ap = get_object_or_404(Appointment, pk=appointment_id)
         # Calcula/valida nova hora usando helper
