@@ -43,7 +43,7 @@ def get_appointment_by_sid_or_404(sid):
 
 def list_filtered_appointments(barber, day_str, hour_str):
     """Lista agendamentos futuros filtrando por barbeiro, data e/ou hora."""
-    qs = Appointment.objects.all().order_by('date', 'hour', 'barber')
+    qs = Appointment.objects.filter(status='ativo').order_by('date', 'hour', 'barber')
     today = date.today()
     now_time = datetime.now().time()
     qs = qs.filter(Q(date__gt=today) | Q(date=today, hour__gte=now_time))

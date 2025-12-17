@@ -1,0 +1,6 @@
+.app-background{
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(1200px 600px at -5% -10%, rgba(16,24,40,.03) 0, transparent 60%),
+    radial-gradient(1200px 600px at 105% 110%, rgba(16,24,40,.03) 0, transparent 60%);
+}

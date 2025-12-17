@@ -5,7 +5,7 @@ from core.helpers.datas import convert_str_to_date, json_empty_hours
 
 def taken_hours(barber, day):
     """Retorna conjunto de horários já agendados para o barbeiro no dia."""
-    return set(Appointment.objects.filter(barber=barber, date=day).values_list('hour', flat=True))
+    return set(Appointment.objects.filter(barber=barber, date=day, status='ativo').values_list('hour', flat=True))
 
 def available_hours_for_day(barber, day):
     """Lista horas disponíveis (como 'HH:MM') para o barbeiro no dia."""
@@ -18,7 +18,7 @@ def available_hours_for_day(barber, day):
 
 def horario_ja_ocupado(barber, day, hr):
     """Indica se o horário está ocupado para o barbeiro e dia informados."""
-    return Appointment.objects.filter(barber=barber, date=day, hour=hr).exists()
+    return Appointment.objects.filter(barber=barber, date=day, hour=hr, status='ativo').exists()
 
 def horarios_disponiveis_response(barber, date_str):
     """Retorna `JsonResponse` com horas disponíveis para o barbeiro na data."""

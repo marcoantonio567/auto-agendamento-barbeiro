@@ -1,5 +1,18 @@
 document.addEventListener('DOMContentLoaded',()=>{
   if (window.lucide && typeof window.lucide.createIcons === 'function') { window.lucide.createIcons(); }
+  const body = document.body;
+  const storedTheme = localStorage.getItem('theme_name') || 'theme-green';
+  const themeClasses = ['theme-green','theme-blue','theme-terracotta','theme-neutral','theme-dark'];
+  body.classList.remove(...themeClasses);
+  body.classList.add(storedTheme);
+  document.querySelectorAll('.theme-dot').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const t = btn.getAttribute('data-theme') || 'theme-green';
+      body.classList.remove(...themeClasses);
+      body.classList.add(t);
+      localStorage.setItem('theme_name', t);
+    });
+  });
   const inp = document.getElementById('client_name');
   const phoneInp = document.getElementById('client_phone');
   const cb = document.getElementById('save_name_checkbox');

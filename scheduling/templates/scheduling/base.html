@@ -12,10 +12,17 @@
     {% block styles %}{% endblock %}
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="https://unpkg.com/lucide@latest/font/lucide.css" />
-</head>
-<body class="app-background">
+ </head>
+ <body class="app-background theme-green">
     <header class="topbar">
         <h1>Barbearia</h1>
+        <div class="nav">
+            <button class="theme-dot green" data-theme="theme-green" title="Verde"></button>
+            <button class="theme-dot blue" data-theme="theme-blue" title="Azul"></button>
+            <button class="theme-dot terracotta" data-theme="theme-terracotta" title="Terracota"></button>
+            <button class="theme-dot neutral" data-theme="theme-neutral" title="Neutro"></button>
+            <button class="theme-dot dark" data-theme="theme-dark" title="Escuro"></button>
+        </div>
     </header>
     <main class="container">
         <div class="{% if is_painel %}painel-layout{% endif %}">

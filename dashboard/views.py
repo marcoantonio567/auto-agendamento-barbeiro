@@ -16,6 +16,7 @@ from core.helpers.datas import shift_hour_by_delta
 from core.helpers.slots import is_valid_slot_for_day
 from core.helpers.phone_validation import PhoneValidator
 from whastsapp_api import send_mensage
+from django.utils import timezone
 
 
 @login_required(login_url='login')
@@ -224,3 +225,40 @@ def whatsapp_send(request):
     if result.get("ok"):
         return JsonResponse(result, status=200)
     return JsonResponse(result, status=400)
+
+
+@login_required(login_url='login')
+@require_http_methods(["POST"])
+def admin_cancel_appointment(request, appointment_id):
+    ap = get_object_or_404(Appointment, pk=appointment_id)
+    if ap.status != 'ativo':
+        messages.warning(request, 'Agendamento já está cancelado')
+        return redirect('admin_detail', appointment_id=ap.id)
+    reason = request.POST.get('reason') or ''
+    ap.status = 'cancelado'
+    ap.cancelled_by = 'barber'
+    ap.cancelled_at = timezone.now()
+    ap.cancel_reason = reason
+    ap.save(update_fields=['status', 'cancelled_by', 'cancelled_at', 'cancel_reason'])
+    phone_digits = PhoneValidator.extract_digits(ap.client_phone)
+    if phone_digits and len(phone_digits) == 10:
+        date_str = ap.date.strftime('%d/%m/%Y')
+        hour_str = ap.hour.strftime('%H:%M')
+        base_text = f"Olá, {ap.client_name}! Seu horário com {ap.barber} em {date_str} às {hour_str} foi cancelado pelo barbeiro."
+        if reason:
+            base_text += f" Motivo: {reason}."
+        base_text += " Se desejar, responda para remarcar."
+        result = send_mensage(phone_digits, base_text)
+        if result.get('ok'):
+            messages.success(request, 'WhatsApp enviado ao cliente informando cancelamento')
+        else:
+            err = result.get('error') or 'erro_desconhecido'
+            details = result.get('details')
+            if details:
+                messages.error(request, f'Falha ao enviar WhatsApp: {err} ({details})')
+            else:
+                messages.error(request, f'Falha ao enviar WhatsApp: {err}')
+    else:
+        messages.warning(request, 'Telefone do cliente inválido para envio de WhatsApp')
+    messages.success(request, 'Agendamento cancelado com sucesso')
+    return redirect('admin_detail', appointment_id=ap.id)

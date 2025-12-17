@@ -15,10 +15,16 @@
         <p><strong>Status de pagamento:</strong> {{ ap.get_payment_status_display }}</p>
         <p><strong>Forma de pagamento:</strong> {{ ap.get_payment_method_display }}</p>
         <p><strong>Horário alterado:</strong> {% if ap.rescheduled %}Sim{% else %}Não{% endif %}</p>
+        <p><strong>Status do agendamento:</strong> {{ ap.get_status_display }}</p>
     </div>
     <div class="actions">
         <button type="button" class="btn-primary open-shift-modal">Mover horário</button>
     </div>
+    {% if ap.status == 'ativo' %}
+    <div class="actions" style="margin-top:12px">
+        <button type="button" class="btn-danger open-cancel-modal">Cancelar agendamento</button>
+    </div>
+    {% endif %}
     {% if ap.payment_method == 'cash' and ap.payment_status != 'pago' %}
     <div class="actions" style="margin-top:12px">
         <form method="post" action="{% url 'admin_confirm_cash' ap.id %}">
@@ -43,6 +49,27 @@
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" id="modalCancel">Cancelar</button>
                     <button type="button" class="btn-primary" id="modalConfirm" disabled>Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form id="cancelForm" method="post" style="display:none" action="{% url 'admin_cancel_appointment' ap.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="reason" id="cancelReasonInput" />
+    </form>
+    <div id="cancelModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <h3>Cancelar agendamento</h3>
+                <p>Confirme o cancelamento e informe um motivo opcional.</p>
+                <div style="margin:8px 0">
+                    <label for="cancelReason" style="display:block;margin-bottom:4px">Motivo (opcional)</label>
+                    <input id="cancelReason" type="text" placeholder="Ex.: imprevisto, indisponibilidade" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius)" />
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelModalCancel">Fechar</button>
+                    <button type="button" class="btn-danger" id="cancelModalConfirm">Cancelar agendamento</button>
                 </div>
             </div>
         </div>
@@ -92,6 +119,34 @@ document.addEventListener('DOMContentLoaded',function(){
         if(typeof shiftForm.requestSubmit==='function'){shiftForm.requestSubmit()}else{shiftForm.submit()}
         hide();
       }else{hide()}
+    });
+  }
+  var cancelModal=document.getElementById('cancelModal');
+  var openCancel=document.querySelector('.open-cancel-modal');
+  var cancelForm=document.getElementById('cancelForm');
+  var cancelReason=document.getElementById('cancelReason');
+  var cancelReasonInput=document.getElementById('cancelReasonInput');
+  var cancelModalCancel=document.getElementById('cancelModalCancel');
+  var cancelModalConfirm=document.getElementById('cancelModalConfirm');
+  function hideCancel(){
+    if(cancelModal){cancelModal.classList.remove('show')}
+    if(cancelReason){cancelReason.value=''}
+  }
+  if(openCancel&&cancelModal){
+    openCancel.addEventListener('click',function(){
+      cancelModal.classList.add('show');
+    });
+  }
+  var cancelBackdrop=cancelModal?cancelModal.querySelector('.modal-backdrop'):null;
+  if(cancelBackdrop){cancelBackdrop.addEventListener('click',hideCancel)}
+  if(cancelModalCancel){cancelModalCancel.addEventListener('click',hideCancel)}
+  if(cancelModalConfirm){
+    cancelModalConfirm.addEventListener('click',function(){
+      if(cancelForm){
+        if(cancelReasonInput&&cancelReason){cancelReasonInput.value=cancelReason.value||''}
+        if(typeof cancelForm.requestSubmit==='function'){cancelForm.requestSubmit()}else{cancelForm.submit()}
+        hideCancel();
+      }else{hideCancel()}
     });
   }
 });

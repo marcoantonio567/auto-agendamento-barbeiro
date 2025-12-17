@@ -2,6 +2,10 @@ from django.db import models
 
 
 class Appointment(models.Model):
+    STATUS_CHOICES = [
+        ('ativo', 'Ativo'),
+        ('cancelado', 'Cancelado'),
+    ]
     SERVICE_CHOICES = [
         ('barba', 'Fazer a barba'),
         ('cabelo', 'Cortar o cabelo'),
@@ -19,6 +23,11 @@ class Appointment(models.Model):
         ('pago', 'Pago'),
         ('falhou', 'Falhou'),
     ]
+    CANCELLED_BY_CHOICES = [
+        ('barber', 'Barbeiro'),
+        ('client', 'Cliente'),
+        ('system', 'Sistema'),
+    ]
     client_name = models.CharField(max_length=100)
     client_phone = models.CharField(max_length=16, blank=True, default='')
     service = models.CharField(max_length=10, choices=SERVICE_CHOICES)
@@ -28,9 +37,13 @@ class Appointment(models.Model):
     payment_status = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default='pendente')
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES, default='cash')
     rescheduled = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='ativo')
+    cancel_reason = models.CharField(max_length=255, blank=True, default='')
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    cancelled_by = models.CharField(max_length=10, choices=CANCELLED_BY_CHOICES, blank=True, default='')
 
     class Meta:
-        unique_together = [('barber', 'date', 'hour')]
+        unique_together = [('barber', 'date', 'hour', 'status')]
         db_table = 'agendamento_appointment'
 
     def price(self):
