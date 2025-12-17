@@ -247,7 +247,6 @@ def admin_cancel_appointment(request, appointment_id):
         base_text = f"Olá, {ap.client_name}! Seu horário com {ap.barber} em {date_str} às {hour_str} foi cancelado pelo barbeiro."
         if reason:
             base_text += f" Motivo: {reason}."
-        base_text += " Se desejar, responda para remarcar."
         result = send_mensage(phone_digits, base_text)
         if result.get('ok'):
             messages.success(request, 'WhatsApp enviado ao cliente informando cancelamento')
