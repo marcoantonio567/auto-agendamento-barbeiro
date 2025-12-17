@@ -5,8 +5,15 @@
 {% endblock %}
 {% block content %}
 <section>
-    <h2>Financeiro</h2>
-    <p><a href="{% url 'logout' %}">Sair</a></p>
+    <div class="header-actions">
+        <div>
+            <h2>Financeiro</h2>
+            <p><a href="{% url 'logout' %}">Sair</a></p>
+        </div>
+        <button id="download-report" class="btn-primary">
+            <i data-lucide="download"></i> Baixar Relatório
+        </button>
+    </div>
     <div class="grid">
         <div class="card">
             <h3>Total virtual (PIX)</h3>
@@ -15,6 +22,38 @@
         <div class="card">
             <h3>Total físico (dinheiro)</h3>
             <p>R${{ total_fisico }}</p>
+        </div>
+    </div>
+    <div class="charts-grid" id="charts-area">
+        <div class="chart-card">
+            <h3>Totais por método</h3>
+            <div class="chart-container">
+                <canvas id="chart-methods"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>Receita por dia</h3>
+            <div class="chart-container">
+                <canvas id="chart-daily"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>Receita por mês</h3>
+            <div class="chart-container">
+                <canvas id="chart-monthly"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>Top serviços por receita</h3>
+            <div class="chart-container">
+                <canvas id="chart-services"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>Ticket médio</h3>
+            <div class="chart-container">
+                <canvas id="chart-ticket"></canvas>
+            </div>
         </div>
     </div>
     <div class="table-responsive" style="margin-top:16px">
@@ -40,7 +79,11 @@
         </tbody>
     </table>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{ finance_init|json_script:"finance-init-data" }}
     <script src="{% static 'dashboard/js/admin.js' %}"></script>
+    <script src="{% static 'dashboard/js/finance_charts.js' %}"></script>
 </section>
 {% endblock %}
 

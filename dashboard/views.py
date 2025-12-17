@@ -80,16 +80,138 @@ class AdminFinanceView(LoginRequiredMixin, View):
     """Exibe resumo financeiro de agendamentos pagos por método."""
 
     def get(self, request):
-        # Obtém datasets pagos e separados por método
         pagos, virtual, fisico = get_paid_appointments()
-        # Calcula totais por método
         total_virtual, total_fisico = compute_totals(virtual, fisico)
-        # Renderiza com lista de pagos para conferência
+        # Métricas iniciais para gráficos
+        today = date.today()
+        start_30d = today - timedelta(days=29)
+        # Receita diária (últimos 30 dias)
+        daily_map = {}
+        for ap in pagos.filter(date__gte=start_30d).order_by('date'):
+            key = ap.date.strftime('%Y-%m-%d')
+            daily_map[key] = daily_map.get(key, 0) + ap.price()
+        daily_labels = sorted(daily_map.keys())
+        daily_values = [daily_map[k] for k in daily_labels]
+        # Receita mensal (últimos 12 meses)
+        start_12m = (today.replace(day=1) - timedelta(days=365))
+        monthly_map = {}
+        for ap in pagos.filter(date__gte=start_12m).order_by('date'):
+            key = f"{ap.date.year}-{ap.date.month:02d}"
+            monthly_map[key] = monthly_map.get(key, 0) + ap.price()
+        monthly_labels = sorted(monthly_map.keys())
+        monthly_values = [monthly_map[k] for k in monthly_labels]
+        # Top serviços por receita
+        service_map = {'barba': 0, 'cabelo': 0, 'combo': 0}
+        for ap in pagos:
+            service_map[ap.service] = service_map.get(ap.service, 0) + ap.price()
+        service_labels = ['barba', 'cabelo', 'combo']
+        service_values = [service_map[s] for s in service_labels]
+        # Ticket médio (últimos 30 dias)
+        last_30_qs = pagos.filter(date__gte=start_30d)
+        count_30 = last_30_qs.count()
+        sum_30 = sum(ap.price() for ap in last_30_qs)
+        ticket_medio = (sum_30 / count_30) if count_30 else 0
+        finance_init = {
+            'totais_por_metodo': {
+                'labels': ['PIX', 'Dinheiro'],
+                'values': [total_virtual, total_fisico],
+            },
+            'receita_diaria': {
+                'labels': daily_labels,
+                'values': daily_values,
+            },
+            'receita_mensal': {
+                'labels': monthly_labels,
+                'values': monthly_values,
+            },
+            'top_servicos': {
+                'labels': service_labels,
+                'values': service_values,
+            },
+            'ticket_medio': {
+                'labels': ['Últimos 30 dias'],
+                'values': [round(ticket_medio, 2)],
+            },
+        }
         return render(request, 'dashboard/admin_finance.html', {
             'pagos': pagos.order_by('-date', '-hour'),
             'total_virtual': total_virtual,
             'total_fisico': total_fisico,
+            'finance_init': finance_init,
             'is_painel': True,
+        })
+
+
+class FinanceMetricsApi(LoginRequiredMixin, View):
+    login_url = 'login'
+    http_method_names = ['get']
+
+    def get(self, request):
+        start = request.GET.get('start')
+        end = request.GET.get('end')
+        metodo = request.GET.get('metodo')
+        servico = request.GET.get('servico')
+        pagos, virtual, fisico = get_paid_appointments()
+        qs = pagos
+        # Filtros opcionais
+        if start:
+            qs = qs.filter(date__gte=start)
+        if end:
+            qs = qs.filter(date__lte=end)
+        if metodo in ('pix', 'cash'):
+            qs = qs.filter(payment_method=metodo)
+        if servico in ('barba', 'cabelo', 'combo'):
+            qs = qs.filter(service=servico)
+        # Recalcula métricas com base no filtro
+        # Totais por método
+        v_qs = qs.filter(payment_method='pix')
+        f_qs = qs.filter(payment_method='cash')
+        total_virtual, total_fisico = compute_totals(v_qs, f_qs)
+        # Receita diária
+        daily_map = {}
+        for ap in qs.order_by('date'):
+            key = ap.date.strftime('%Y-%m-%d')
+            daily_map[key] = daily_map.get(key, 0) + ap.price()
+        daily_labels = sorted(daily_map.keys())
+        daily_values = [daily_map[k] for k in daily_labels]
+        # Receita mensal
+        monthly_map = {}
+        for ap in qs.order_by('date'):
+            key = f"{ap.date.year}-{ap.date.month:02d}"
+            monthly_map[key] = monthly_map.get(key, 0) + ap.price()
+        monthly_labels = sorted(monthly_map.keys())
+        monthly_values = [monthly_map[k] for k in monthly_labels]
+        # Top serviços
+        service_map = {'barba': 0, 'cabelo': 0, 'combo': 0}
+        for ap in qs:
+            service_map[ap.service] = service_map.get(ap.service, 0) + ap.price()
+        service_labels = ['barba', 'cabelo', 'combo']
+        service_values = [service_map[s] for s in service_labels]
+        # Ticket médio
+        count = qs.count()
+        sum_total = sum(ap.price() for ap in qs)
+        ticket_medio = (sum_total / count) if count else 0
+        return JsonResponse({
+            'totais_por_metodo': {
+                'labels': ['PIX', 'Dinheiro'],
+                'values': [total_virtual, total_fisico],
+            },
+            'receita_diaria': {
+                'labels': daily_labels,
+                'values': daily_values,
+            },
+            'receita_mensal': {
+                'labels': monthly_labels,
+                'values': monthly_values,
+            },
+            'top_servicos': {
+                'labels': service_labels,
+                'values': service_values,
+            },
+            'ticket_medio': {
+                'labels': ['Período selecionado'],
+                'values': [round(ticket_medio, 2)],
+            },
         })
 
 

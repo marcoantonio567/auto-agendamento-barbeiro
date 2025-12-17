@@ -12,5 +12,7 @@ urlpatterns = [
     path('admin/dashboard/<int:appointment_id>/cancel/', views.admin_cancel_appointment, name='admin_cancel_appointment'),
     path('admin/historico/', views.admin_history, name='admin_history'),
     path('admin/financeiro/', views.admin_finance, name='admin_finance'),
+    path('admin/financeiro/api/metrics/', views.FinanceMetricsApi.as_view(), name='finance_metrics'),
+    path('dashboard/api/financeiro/metrics/', views.FinanceMetricsApi.as_view(), name='finance_metrics_alias'),
     path('api/whatsapp/send/', views.whatsapp_send, name='whatsapp_send'),
 ]
