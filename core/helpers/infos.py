@@ -32,3 +32,21 @@ BARBERS = [
 def obter_barbers_keys():
     """Retorna lista de chaves dos barbeiros disponíveis."""
     return [b['key'] for b in BARBERS]
+
+def obter_barbers():
+    """Retorna lista de barbeiros com foto dinâmica vinculada ao avatar quando disponível."""
+    try:
+        from users.models import User
+    except Exception:
+        return BARBERS
+    result = []
+    for b in BARBERS:
+        photo = b.get('photo')
+        try:
+            u = User.objects.filter(username=b['key']).first()
+            if u and getattr(u, 'avatar', None) and u.avatar:
+                photo = u.avatar.url
+        except Exception:
+            pass
+        result.append({'key': b['key'], 'name': b['name'], 'photo': photo})
+    return result

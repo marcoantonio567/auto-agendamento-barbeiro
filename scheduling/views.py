@@ -3,7 +3,7 @@ from django.http import HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
 from core.helpers.self_service_token import validar_token
-from core.helpers.infos import SERVICES, BARBERS
+from core.helpers.infos import SERVICES, BARBERS, obter_barbers, obter_barbers_keys
 import random
 from core.helpers.datas import get_future_days, convert_str_to_date, convert_str_to_day_and_hour
 from datetime import date as ddate, timedelta
@@ -27,10 +27,10 @@ def step_barber(request):
     if request.method == 'POST':
         choice = request.POST.get('barber')
         if choice == 'ANY':
-            choice = random.choice([b['key'] for b in BARBERS])
+            choice = random.choice(obter_barbers_keys())
         request.session['barber'] = choice
         return redirect('step_date')
-    return render(request, 'scheduling/step_barber.html', {'barbers': BARBERS, 'back_url': 'step_service'})
+    return render(request, 'scheduling/step_barber.html', {'barbers': obter_barbers(), 'back_url': 'step_service'})
 
 def step_date(request):
     verificar_step(request, 'barber')

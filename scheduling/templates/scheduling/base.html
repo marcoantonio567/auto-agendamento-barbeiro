@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="https://unpkg.com/lucide@latest/font/lucide.css" />
  </head>
- <body class="app-background theme-green">
+ <body class="app-background {% if request.user.is_authenticated %}{{ request.user.theme_name|default:'theme-green' }}{% else %}theme-green{% endif %}">
     <header class="topbar">
         <h1>Barbearia</h1>
         <div class="nav">
@@ -31,6 +31,7 @@
                 <a href="{% url 'admin_list' %}" class="{% if request.resolver_match.url_name == 'admin_list' %}active{% endif %}"><i data-lucide="calendar"></i> Agendamentos</a>
                 <a href="{% url 'admin_history' %}" class="{% if request.resolver_match.url_name == 'admin_history' %}active{% endif %}"><i data-lucide="history"></i> Histórico</a>
                 <a href="{% url 'admin_finance' %}" class="{% if request.resolver_match.url_name == 'admin_finance' %}active{% endif %}"><i data-lucide="wallet"></i> Financeiro</a>
+                <a href="{% url 'admin_profile' %}" class="{% if request.resolver_match.url_name == 'admin_profile' %}active{% endif %}"><i data-lucide="user"></i> Perfil</a>
             </aside>
             {% endif %}
             <section class="{% if is_painel %}pane-content{% endif %}">

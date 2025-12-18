@@ -15,4 +15,5 @@ urlpatterns = [
     path('admin/financeiro/api/metrics/', views.FinanceMetricsApi.as_view(), name='finance_metrics'),
     path('dashboard/api/financeiro/metrics/', views.FinanceMetricsApi.as_view(), name='finance_metrics_alias'),
     path('api/whatsapp/send/', views.whatsapp_send, name='whatsapp_send'),
+    path('admin/perfil/', views.admin_profile, name='admin_profile'),
 ]

@@ -5,6 +5,8 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from scheduling.models import Appointment
 from core.helpers.infos import obter_barbers_keys
 from core.helpers.fluxo import list_filtered_appointments, get_hours_opts, get_dates_opts
@@ -23,6 +25,11 @@ from core.helpers.notifications import (
     send_whatsapp_and_feedback,
     notify_client_change
 )
+from django.core.files.base import ContentFile
+from io import BytesIO
+from PIL import Image
+from django.conf import settings
+import os
 from core.helpers.appointments import compute_new_hour, apply_hour_shift
 from datetime import date, timedelta
 
@@ -361,3 +368,79 @@ admin_shift_hour = AdminShiftHourView.as_view()
 admin_confirm_cash = AdminConfirmCashView.as_view()
 whatsapp_send = WhatsAppSendView.as_view()
 admin_cancel_appointment = AdminCancelAppointmentView.as_view()
+
+
+class AdminProfileView(LoginRequiredMixin, View):
+    login_url = 'login'
+    """Perfil do administrador: aparência, foto e segurança."""
+
+    def get(self, request):
+        return render(request, 'dashboard/admin_profile.html', {
+            'is_painel': True,
+        })
+
+    def post(self, request):
+        form_type = request.POST.get('form_type')
+        if form_type == 'appearance':
+            theme = request.POST.get('theme_name') or 'theme-green'
+            if hasattr(request.user, 'theme_name'):
+                request.user.theme_name = theme
+                request.user.save(update_fields=['theme_name'])
+            messages.success(request, 'Tema atualizado')
+            return redirect('admin_profile')
+        elif form_type == 'password':
+            form = PasswordChangeForm(user=request.user, data=request.POST)
+            if form.is_valid():
+                user = form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Senha atualizada com sucesso')
+                return redirect('admin_profile')
+            for field, errs in form.errors.items():
+                for e in errs:
+                    messages.error(request, f'{e}')
+            return redirect('admin_profile')
+        elif form_type == 'avatar':
+            image_file = request.FILES.get('avatar')
+            try:
+                x = float(request.POST.get('crop_x', '0') or '0')
+                y = float(request.POST.get('crop_y', '0') or '0')
+                w = float(request.POST.get('crop_w', '0') or '0')
+                h = float(request.POST.get('crop_h', '0') or '0')
+            except ValueError:
+                x = y = w = h = 0
+            if not image_file:
+                messages.error(request, 'Nenhuma imagem enviada')
+                return redirect('admin_profile')
+            try:
+                ctype = getattr(image_file, 'content_type', '') or ''
+                if ctype not in ('image/png', 'image/jpeg', 'image/jpg'):
+                    messages.error(request, 'Formato inválido. Envie PNG ou JPEG.')
+                    return redirect('admin_profile')
+                img = Image.open(image_file)
+                if img.mode not in ('RGB', 'RGBA'):
+                    img = img.convert('RGB')
+                ow, oh = img.size
+                if ow < 96 or oh < 96:
+                    messages.error(request, 'Imagem muito pequena. Mínimo 96×96 px.')
+                    return redirect('admin_profile')
+                if w <= 0 or h <= 0:
+                    side = min(ow, oh)
+                    x = (ow - side) / 2
+                    y = (oh - side) / 2
+                    w = h = side
+                box = (max(0, int(x)), max(0, int(y)), min(ow, int(x + w)), min(oh, int(y + h)))
+                cropped = img.crop(box)
+                final = cropped.resize((96, 96), Image.Resampling.LANCZOS)
+                buffer = BytesIO()
+                final.save(buffer, format='PNG', optimize=True)
+                buffer.seek(0)
+                filename = f'avatar_user_{request.user.id}.png'
+                request.user.avatar.save(filename, ContentFile(buffer.read()), save=True)
+                messages.success(request, 'Foto de perfil atualizada')
+            except Exception:
+                messages.error(request, 'Falha ao processar a imagem. Tente outro arquivo.')
+            return redirect('admin_profile')
+        messages.error(request, 'Ação inválida')
+        return redirect('admin_profile')
+
+admin_profile = AdminProfileView.as_view()

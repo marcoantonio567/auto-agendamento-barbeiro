@@ -1,0 +1,192 @@
+{% extends 'scheduling/base.html' %}
+{% load static %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'dashboard/css/admin.css' %}" />
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css" />
+    <style>
+      .profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+      .preview-grid{display:flex;gap:12px;align-items:center;margin-top:8px}
+      .preview-box{display:flex;flex-direction:column;gap:6px;align-items:center}
+      .preview-96{width:96px;height:96px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--elev)}
+      .preview-80{width:80px;height:80px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--elev)}
+      .cropper-area{width:100%;max-height:320px;border:1px dashed var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card)}
+      .file-input{display:block;width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);color:var(--text)}
+      .field{display:flex;flex-direction:column;gap:6px}
+    </style>
+{% endblock %}
+{% block content %}
+<section>
+  <h2>Perfil</h2>
+  <div class="profile-grid">
+    <div class="card">
+      <h3>Aparência</h3>
+      <p>Escolha o tema de cores do painel.</p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="appearance" />
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0">
+          <button type="button" class="theme-dot green" data-theme="theme-green" title="Verde"></button>
+          <button type="button" class="theme-dot blue" data-theme="theme-blue" title="Azul"></button>
+          <button type="button" class="theme-dot terracotta" data-theme="theme-terracotta" title="Terracota"></button>
+          <button type="button" class="theme-dot neutral" data-theme="theme-neutral" title="Neutro"></button>
+          <button type="button" class="theme-dot dark" data-theme="theme-dark" title="Escuro"></button>
+        </div>
+        <input type="hidden" id="theme_name_input" name="theme_name" value="{{ request.user.theme_name|default:'theme-green' }}" />
+        <div class="actions" style="margin-top:8px">
+          <button type="submit" class="btn-primary"><i data-lucide="palette"></i> Salvar tema</button>
+        </div>
+      </form>
+    </div>
+    <div class="card">
+      <h3>Foto de perfil</h3>
+      <p>Envie e ajuste sua foto para ficar quadrada. O resultado será 96×96 px.</p>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="avatar" />
+        <div class="field">
+          <label for="avatar_file">Imagem</label>
+          <input id="avatar_file" class="file-input" type="file" name="avatar" accept="image/png,image/jpeg" />
+        </div>
+        <div id="cropperContainer" class="cropper-area" style="margin-top:8px">
+          {% if request.user.avatar %}
+          <img id="cropperImage" src="{{ request.user.avatar.url }}" alt="Avatar" style="max-width:100%;display:block" />
+          {% else %}
+          <img id="cropperImage" src="" alt="Avatar" style="max-width:100%;display:none" />
+          {% endif %}
+        </div>
+        <input type="hidden" name="crop_x" id="crop_x" />
+        <input type="hidden" name="crop_y" id="crop_y" />
+        <input type="hidden" name="crop_w" id="crop_w" />
+        <input type="hidden" name="crop_h" id="crop_h" />
+        <div class="preview-grid">
+          <div class="preview-box">
+            <span>96×96</span>
+            <div class="preview-96">
+              {% if request.user.avatar %}
+              <img id="preview96" src="{{ request.user.avatar.url }}" alt="Preview 96" style="width:100%;height:100%;object-fit:cover" />
+              {% else %}
+              <img id="preview96" src="" alt="Preview 96" style="width:100%;height:100%;object-fit:cover" />
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="actions" style="margin-top:8px">
+          <button type="submit" class="btn-primary"><i data-lucide="image"></i> Salvar foto</button>
+        </div>
+      </form>
+    </div>
+    <div class="card">
+      <h3>Segurança</h3>
+      <p>Atualize sua senha.</p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="password" />
+        <div class="field">
+          <label for="old_password">Senha atual</label>
+          <div class="input-with-icon">
+            <i data-lucide="lock"></i>
+            <input id="old_password" type="password" name="old_password" />
+            <button type="button" class="btn-secondary" id="toggle_old" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:6px 10px"><i data-lucide="eye"></i></button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="new_password1">Nova senha</label>
+          <div class="input-with-icon">
+            <i data-lucide="lock"></i>
+            <input id="new_password1" type="password" name="new_password1" />
+            <button type="button" class="btn-secondary" id="toggle_new1" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:6px 10px"><i data-lucide="eye"></i></button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="new_password2">Confirmar nova senha</label>
+          <div class="input-with-icon">
+            <i data-lucide="lock"></i>
+            <input id="new_password2" type="password" name="new_password2" />
+            <button type="button" class="btn-secondary" id="toggle_new2" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:6px 10px"><i data-lucide="eye"></i></button>
+          </div>
+        </div>
+        <div class="actions" style="margin-top:8px">
+          <button type="submit" class="btn-primary"><i data-lucide="lock"></i> Atualizar senha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+<script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var body=document.body;
+  var themeInput=document.getElementById('theme_name_input');
+  document.querySelectorAll('.theme-dot').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var t=btn.getAttribute('data-theme')||'theme-green';
+      var themeClasses=['theme-green','theme-blue','theme-terracotta','theme-neutral','theme-dark'];
+      body.classList.remove.apply(body.classList,themeClasses);
+      body.classList.add(t);
+      localStorage.setItem('theme_name',t);
+      if(themeInput){ themeInput.value=t; }
+    });
+  });
+  var fileInp=document.getElementById('avatar_file');
+  var img=document.getElementById('cropperImage');
+  var preview96=document.getElementById('preview96');
+  var preview80=document.getElementById('preview80');
+  var cropper=null;
+  function updatePreviews(){
+    if(!img || !img.src) return;
+    if(preview96){ preview96.src = img.src; }
+  }
+  updatePreviews();
+  function initCropper(){
+    if(!img) return;
+    if(cropper){ cropper.destroy(); cropper=null; }
+    cropper=new Cropper(img, {
+      viewMode:1,
+      aspectRatio:1,
+      autoCropArea:1,
+      responsive:true,
+      movable:false,
+      zoomable:true,
+      rotatable:false,
+      scalable:false,
+      ready:function(){ updatePreviews(); },
+      crop:function(e){
+        var d = cropper.getData(true);
+        var xInp=document.getElementById('crop_x');
+        var yInp=document.getElementById('crop_y');
+        var wInp=document.getElementById('crop_w');
+        var hInp=document.getElementById('crop_h');
+        if(xInp) xInp.value = Math.max(0, Math.round(d.x||0));
+        if(yInp) yInp.value = Math.max(0, Math.round(d.y||0));
+        if(wInp) wInp.value = Math.max(1, Math.round(d.width||0));
+        if(hInp) hInp.value = Math.max(1, Math.round(d.height||0));
+      }
+    });
+  }
+  if(fileInp){
+    fileInp.addEventListener('change',function(){
+      var f=fileInp.files && fileInp.files[0];
+      if(!f) return;
+      var url=URL.createObjectURL(f);
+      if(img){
+        img.src=url;
+        img.style.display='block';
+        img.onload=function(){ initCropper(); URL.revokeObjectURL(url); };
+      }
+    });
+  }
+  var tOld=document.getElementById('toggle_old');
+  var tN1=document.getElementById('toggle_new1');
+  var tN2=document.getElementById('toggle_new2');
+  function bindToggle(btn, inp){
+    if(!btn || !inp) return;
+    btn.addEventListener('click',function(){
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    });
+  }
+  bindToggle(tOld, document.getElementById('old_password'));
+  bindToggle(tN1, document.getElementById('new_password1'));
+  bindToggle(tN2, document.getElementById('new_password2'));
+});
+</script>
+{% endblock %}
