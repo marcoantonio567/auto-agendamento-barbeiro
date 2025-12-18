@@ -39,13 +39,17 @@
     </div>
     <div class="card">
       <h3>Foto de perfil</h3>
+      <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid var(--danger); border-radius: var(--radius); padding: 12px; margin-bottom: 16px; color: var(--danger); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+        <i data-lucide="alert-triangle"></i>
+        <span>Funcionalidade em manutenção</span>
+      </div>
       <p>Envie e ajuste sua foto para ficar quadrada. O resultado será 96×96 px.</p>
-      <form method="post" enctype="multipart/form-data">
+      <form method="post" enctype="multipart/form-data" style="opacity: 0.5; pointer-events: none;">
         {% csrf_token %}
         <input type="hidden" name="form_type" value="avatar" />
         <div class="field">
           <label for="avatar_file">Imagem</label>
-          <input id="avatar_file" class="file-input" type="file" name="avatar" accept="image/png,image/jpeg" />
+          <input id="avatar_file" class="file-input" type="file" name="avatar" accept="image/png,image/jpeg" disabled />
         </div>
         <div id="cropperContainer" class="cropper-area" style="margin-top:8px">
           {% if request.user.avatar %}
@@ -71,7 +75,7 @@
           </div>
         </div>
         <div class="actions" style="margin-top:8px">
-          <button type="submit" class="btn-primary"><i data-lucide="image"></i> Salvar foto</button>
+          <button type="submit" class="btn-primary" disabled><i data-lucide="image"></i> Salvar foto</button>
         </div>
       </form>
     </div>
