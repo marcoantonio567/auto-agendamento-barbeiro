@@ -11,7 +11,7 @@
     <h2>Escolha o horário</h2>
     <form method="post">
         {% csrf_token %}
-        <div class="options">
+        <div class="options" data-update="hours" data-barber="{{ barber }}" data-date="{{ date_str }}">
             {% for h in hours %}
             <label class="option-card">
                 <input type="radio" name="hour" value="{{ h }}" required />

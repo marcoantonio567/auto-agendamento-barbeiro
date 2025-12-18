@@ -1,4 +1,4 @@
-from datetime import date as ddate, timedelta
+from datetime import date as ddate, timedelta, datetime
 from .slots import slots_for_day
 from django.shortcuts import redirect
 
@@ -9,6 +9,10 @@ def dia_e_hora_validos(day, hr):
     today = ddate.today()
     if day < today or day > today + timedelta(days=7):
         return False
+    if day == today:
+        now_time = datetime.now().time()
+        if hr < now_time:
+            return False
     return hr in slots_for_day(day)
 
 def verificar_step(request, step):

@@ -49,22 +49,22 @@ def step_hour(request):
     if request.method == 'POST':
         request.session['hour'] = request.POST.get('hour')
         return redirect('step_client')
-    return render(request, 'scheduling/step_hour.html', {'hours': hours, 'back_url': 'step_date'})
+    return render(request, 'scheduling/step_hour.html', {'hours': hours, 'back_url': 'step_date', 'barber': barber, 'date_str': date_str})
 
 def step_client(request):
     verificar_step(request, 'hour')
     if request.method == 'POST':
         data = get_datas_step_client(request)
         if not data:
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest('Dados incompletos para o agendamento.')
         client_name, client_phone, service, barber, date_str, hour_str = data
         if not PhoneValidator.is_valid_brazil_number(client_phone):
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest('Número de telefone inválido.')
         day, hr = convert_str_to_day_and_hour(date_str, hour_str)
         if not dia_e_hora_validos(day, hr):
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest('Horário já passou. Escolha um horário futuro.')
         if horario_ja_ocupado(barber, day, hr):
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest('Horário indisponível. Selecione outro horário.')
         return criar_agendamento_e_redirecionar(request, client_name, client_phone, service, barber, day, hr)
     return render(request, 'scheduling/step_client.html', {'back_url': 'step_hour'})
 

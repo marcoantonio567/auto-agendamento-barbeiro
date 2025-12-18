@@ -2,6 +2,7 @@ from core.helpers.validacao import get_hours_delta_from_direction
 from core.helpers.datas import shift_hour_by_delta
 from core.helpers.slots import is_valid_slot_for_day
 from core.helpers.disponibilidade import horario_ja_ocupado
+from datetime import date as ddate, datetime
 
 
 def compute_new_hour(appointment, direction):
@@ -19,6 +20,9 @@ def compute_new_hour(appointment, direction):
     new_hour = shift_hour_by_delta(appointment.date, appointment.hour, hours_delta)
     # Valida slot do dia
     if not is_valid_slot_for_day(appointment.date, new_hour):
+        return None, 'invalid_slot'
+    # Impede mover para horário passado no dia atual
+    if appointment.date == ddate.today() and new_hour < datetime.now().time():
         return None, 'invalid_slot'
     # Valida conflito com outro agendamento do barbeiro
     if horario_ja_ocupado(appointment.barber, appointment.date, new_hour):

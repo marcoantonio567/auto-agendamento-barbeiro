@@ -2,6 +2,7 @@ from scheduling.models import Appointment
 from .slots import slots_for_day
 from django.http import JsonResponse
 from core.helpers.datas import convert_str_to_date, json_empty_hours
+from datetime import datetime, date as ddate
 
 def taken_hours(barber, day):
     """Retorna conjunto de horários já agendados para o barbeiro no dia."""
@@ -11,7 +12,11 @@ def available_hours_for_day(barber, day):
     """Lista horas disponíveis (como 'HH:MM') para o barbeiro no dia."""
     taken = taken_hours(barber, day)
     hours = []
+    now_time = datetime.now().time()
+    today = ddate.today()
     for hr in slots_for_day(day):
+        if day == today and hr < now_time:
+            continue
         if hr not in taken:
             hours.append(hr.strftime('%H:%M'))
     return hours
