@@ -1,4 +1,5 @@
 from scheduling.models import Appointment
+from datetime import date, timedelta
 
 
 def get_paid_appointments():
@@ -85,3 +86,45 @@ def calculate_average_ticket(queryset):
     count = queryset.count()
     total = sum(ap.price() for ap in queryset)
     return (total / count) if count else 0
+
+
+def get_finance_dashboard_data(pagos_qs, total_virtual, total_fisico):
+    """Constrói o dicionário de dados para o dashboard financeiro."""
+    today = date.today()
+    start_30d = today - timedelta(days=29)
+    
+    # Receita diária (últimos 30 dias)
+    daily_labels, daily_values = calculate_daily_revenue(pagos_qs.filter(date__gte=start_30d))
+    
+    # Receita mensal (últimos 12 meses)
+    start_12m = (today.replace(day=1) - timedelta(days=365))
+    monthly_labels, monthly_values = calculate_monthly_revenue(pagos_qs.filter(date__gte=start_12m))
+    
+    # Top serviços por receita
+    service_labels, service_values = calculate_top_services(pagos_qs)
+    
+    # Ticket médio (últimos 30 dias)
+    ticket_medio = calculate_average_ticket(pagos_qs.filter(date__gte=start_30d))
+
+    return {
+        'totais_por_metodo': {
+            'labels': ['PIX', 'Dinheiro'],
+            'values': [total_virtual, total_fisico],
+        },
+        'receita_diaria': {
+            'labels': daily_labels,
+            'values': daily_values,
+        },
+        'receita_mensal': {
+            'labels': monthly_labels,
+            'values': monthly_values,
+        },
+        'top_servicos': {
+            'labels': service_labels,
+            'values': service_values,
+        },
+        'ticket_medio': {
+            'labels': ['Últimos 30 dias'],
+            'values': [round(ticket_medio, 2)],
+        },
+    }

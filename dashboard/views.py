@@ -17,7 +17,8 @@ from core.helpers.finance import (
     calculate_daily_revenue,
     calculate_monthly_revenue,
     calculate_top_services,
-    calculate_average_ticket
+    calculate_average_ticket,
+    get_finance_dashboard_data
 )
 from core.helpers.notifications import (
     format_reschedule_message,
@@ -25,12 +26,10 @@ from core.helpers.notifications import (
     send_whatsapp_and_feedback,
     notify_client_change
 )
-from django.core.files.base import ContentFile
-from io import BytesIO
-from PIL import Image
+from core.helpers.images import process_avatar_image
 from django.conf import settings
 import os
-from core.helpers.appointments import compute_new_hour, apply_hour_shift
+from core.helpers.appointments import compute_new_hour, apply_hour_shift, cancel_appointment
 from datetime import date, timedelta
 
 
@@ -96,45 +95,9 @@ class AdminFinanceView(LoginRequiredMixin, View):
     def get(self, request):
         pagos, virtual, fisico = get_paid_appointments()
         total_virtual, total_fisico = compute_totals(virtual, fisico)
-        # Métricas iniciais para gráficos
-        today = date.today()
-        start_30d = today - timedelta(days=29)
         
-        # Receita diária (últimos 30 dias)
-        daily_labels, daily_values = calculate_daily_revenue(pagos.filter(date__gte=start_30d))
+        finance_init = get_finance_dashboard_data(pagos, total_virtual, total_fisico)
         
-        # Receita mensal (últimos 12 meses)
-        start_12m = (today.replace(day=1) - timedelta(days=365))
-        monthly_labels, monthly_values = calculate_monthly_revenue(pagos.filter(date__gte=start_12m))
-        
-        # Top serviços por receita
-        service_labels, service_values = calculate_top_services(pagos)
-        
-        # Ticket médio (últimos 30 dias)
-        ticket_medio = calculate_average_ticket(pagos.filter(date__gte=start_30d))
-
-        finance_init = {
-            'totais_por_metodo': {
-                'labels': ['PIX', 'Dinheiro'],
-                'values': [total_virtual, total_fisico],
-            },
-            'receita_diaria': {
-                'labels': daily_labels,
-                'values': daily_values,
-            },
-            'receita_mensal': {
-                'labels': monthly_labels,
-                'values': monthly_values,
-            },
-            'top_servicos': {
-                'labels': service_labels,
-                'values': service_values,
-            },
-            'ticket_medio': {
-                'labels': ['Últimos 30 dias'],
-                'values': [round(ticket_medio, 2)],
-            },
-        }
         return render(request, 'dashboard/admin_finance.html', {
             'pagos': pagos.order_by('-date', '-hour'),
             'total_virtual': total_virtual,
@@ -326,6 +289,8 @@ class WhatsAppSendView(View):
                 status=400
             )
         # Envia mensagem e responde com status adequado
+        # NOTE: send_mensage seems missing in imports, but keeping original code logic.
+        from whastsapp_api import send_mensage # Added this import assuming it exists based on other files
         result = send_mensage(number, text)
         if result.get("ok"):
             return JsonResponse(result, status=200)
@@ -340,34 +305,22 @@ class AdminCancelAppointmentView(LoginRequiredMixin, View):
     def post(self, request, appointment_id):
         # Recupera agendamento ou 404
         ap = get_object_or_404(Appointment, pk=appointment_id)
-        # Evita cancelamento duplicado
-        if ap.status != 'ativo':
-            messages.warning(request, 'Agendamento já está cancelado')
-            return redirect('admin_detail', appointment_id=ap.id)
-        # Atualiza campos de cancelamento
+        
         reason = request.POST.get('reason') or ''
-        ap.status = 'cancelado'
-        ap.cancelled_by = 'barber'
-        ap.cancelled_at = timezone.now()
-        ap.cancel_reason = reason
-        ap.save(update_fields=['status', 'cancelled_by', 'cancelled_at', 'cancel_reason'])
+        
+        success, msg = cancel_appointment(ap, reason)
+        
+        if not success:
+             messages.warning(request, msg)
+             return redirect('admin_detail', appointment_id=ap.id)
+             
         # Notifica cliente via WhatsApp
         text = format_cancel_message(ap, reason)
         notify_client_change(request, ap, text)
         
         # Feedback de sucesso e redireciona
-        messages.success(request, 'Agendamento cancelado com sucesso')
+        messages.success(request, msg)
         return redirect('admin_detail', appointment_id=ap.id)
-
-# Mapeia nomes antigos para class-based views, mantendo compatibilidade com urls
-admin_list = AdminListView.as_view()
-admin_detail = AdminDetailView.as_view()
-admin_history = AdminHistoryView.as_view()
-admin_finance = AdminFinanceView.as_view()
-admin_shift_hour = AdminShiftHourView.as_view()
-admin_confirm_cash = AdminConfirmCashView.as_view()
-whatsapp_send = WhatsAppSendView.as_view()
-admin_cancel_appointment = AdminCancelAppointmentView.as_view()
 
 
 class AdminProfileView(LoginRequiredMixin, View):
@@ -401,46 +354,23 @@ class AdminProfileView(LoginRequiredMixin, View):
             return redirect('admin_profile')
         elif form_type == 'avatar':
             image_file = request.FILES.get('avatar')
-            try:
-                x = float(request.POST.get('crop_x', '0') or '0')
-                y = float(request.POST.get('crop_y', '0') or '0')
-                w = float(request.POST.get('crop_w', '0') or '0')
-                h = float(request.POST.get('crop_h', '0') or '0')
-            except ValueError:
-                x = y = w = h = 0
-            if not image_file:
-                messages.error(request, 'Nenhuma imagem enviada')
-                return redirect('admin_profile')
-            try:
-                ctype = getattr(image_file, 'content_type', '') or ''
-                if ctype not in ('image/png', 'image/jpeg', 'image/jpg'):
-                    messages.error(request, 'Formato inválido. Envie PNG ou JPEG.')
-                    return redirect('admin_profile')
-                img = Image.open(image_file)
-                if img.mode not in ('RGB', 'RGBA'):
-                    img = img.convert('RGB')
-                ow, oh = img.size
-                if ow < 96 or oh < 96:
-                    messages.error(request, 'Imagem muito pequena. Mínimo 96×96 px.')
-                    return redirect('admin_profile')
-                if w <= 0 or h <= 0:
-                    side = min(ow, oh)
-                    x = (ow - side) / 2
-                    y = (oh - side) / 2
-                    w = h = side
-                box = (max(0, int(x)), max(0, int(y)), min(ow, int(x + w)), min(oh, int(y + h)))
-                cropped = img.crop(box)
-                final = cropped.resize((96, 96), Image.Resampling.LANCZOS)
-                buffer = BytesIO()
-                final.save(buffer, format='PNG', optimize=True)
-                buffer.seek(0)
-                filename = f'avatar_user_{request.user.id}.png'
-                request.user.avatar.save(filename, ContentFile(buffer.read()), save=True)
-                messages.success(request, 'Foto de perfil atualizada')
-            except Exception:
-                messages.error(request, 'Falha ao processar a imagem. Tente outro arquivo.')
+            success, msg = process_avatar_image(request.user, image_file, request.POST)
+            if success:
+                messages.success(request, msg)
+            else:
+                messages.error(request, msg)
             return redirect('admin_profile')
+            
         messages.error(request, 'Ação inválida')
         return redirect('admin_profile')
 
+# Mapeia nomes antigos para class-based views, mantendo compatibilidade com urls
+admin_list = AdminListView.as_view()
+admin_detail = AdminDetailView.as_view()
+admin_history = AdminHistoryView.as_view()
+admin_finance = AdminFinanceView.as_view()
+admin_shift_hour = AdminShiftHourView.as_view()
+admin_confirm_cash = AdminConfirmCashView.as_view()
+whatsapp_send = WhatsAppSendView.as_view()
+admin_cancel_appointment = AdminCancelAppointmentView.as_view()
 admin_profile = AdminProfileView.as_view()

@@ -3,6 +3,7 @@ from core.helpers.datas import shift_hour_by_delta
 from core.helpers.slots import is_valid_slot_for_day
 from core.helpers.disponibilidade import horario_ja_ocupado
 from datetime import date as ddate, datetime
+from django.utils import timezone
 
 
 def compute_new_hour(appointment, direction):
@@ -37,3 +38,18 @@ def apply_hour_shift(appointment, new_hour):
     appointment.save(update_fields=['hour', 'rescheduled'])
     return appointment
 
+
+def cancel_appointment(appointment, reason, cancelled_by='barber'):
+    """Cancela o agendamento e atualiza os metadados.
+    
+    Retorna: (success, message)
+    """
+    if appointment.status != 'ativo':
+        return False, 'Agendamento já está cancelado'
+        
+    appointment.status = 'cancelado'
+    appointment.cancelled_by = cancelled_by
+    appointment.cancelled_at = timezone.now()
+    appointment.cancel_reason = reason
+    appointment.save(update_fields=['status', 'cancelled_by', 'cancelled_at', 'cancel_reason'])
+    return True, 'Agendamento cancelado com sucesso'
