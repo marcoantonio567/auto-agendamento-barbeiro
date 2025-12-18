@@ -60,3 +60,6 @@
 }
 .header-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .btn-primary{padding:8px 16px;border:none;border-radius:var(--radius);background:var(--accent);color:var(--accent-foreground);cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.btn-logout{padding:8px 14px;border:1px solid #ef4444;border-radius:var(--radius);background:transparent;color:#ef4444;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn-logout:hover{background:rgba(239,68,68,.1)}
+.btn-logout:active{transform:translateY(1px)}

@@ -27,10 +27,10 @@
     {% endif %}
     {% if ap.payment_method == 'cash' and ap.payment_status != 'pago' %}
     <div class="actions" style="margin-top:12px">
-        <form method="post" action="{% url 'admin_confirm_cash' ap.id %}">
+        <form id="cashConfirmForm" method="post" action="{% url 'admin_confirm_cash' ap.id %}">
             {% csrf_token %}
-            <button type="submit" class="btn-secondary">Confirmar pagamento em dinheiro</button>
         </form>
+        <button type="button" class="btn-secondary open-cash-modal">Confirmar pagamento em dinheiro</button>
     </div>
     {% endif %}
     <form id="shiftForm" method="post" style="display:none">
@@ -70,6 +70,19 @@
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" id="cancelModalCancel">Fechar</button>
                     <button type="button" class="btn-danger" id="cancelModalConfirm">Cancelar agendamento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="cashModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <h3>Confirmar recebimento</h3>
+                <p>Confirme que recebeu o dinheiro do cliente.</p>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cashModalCancel">Fechar</button>
+                    <button type="button" class="btn-primary" id="cashModalConfirm">Confirmar recebimento</button>
                 </div>
             </div>
         </div>
@@ -147,6 +160,30 @@ document.addEventListener('DOMContentLoaded',function(){
         if(typeof cancelForm.requestSubmit==='function'){cancelForm.requestSubmit()}else{cancelForm.submit()}
         hideCancel();
       }else{hideCancel()}
+    });
+  }
+  var cashModal=document.getElementById('cashModal');
+  var openCash=document.querySelector('.open-cash-modal');
+  var cashForm=document.getElementById('cashConfirmForm');
+  var cashModalCancel=document.getElementById('cashModalCancel');
+  var cashModalConfirm=document.getElementById('cashModalConfirm');
+  function hideCash(){
+    if(cashModal){cashModal.classList.remove('show')}
+  }
+  if(openCash&&cashModal){
+    openCash.addEventListener('click',function(){
+      cashModal.classList.add('show');
+    });
+  }
+  var cashBackdrop=cashModal?cashModal.querySelector('.modal-backdrop'):null;
+  if(cashBackdrop){cashBackdrop.addEventListener('click',hideCash)}
+  if(cashModalCancel){cashModalCancel.addEventListener('click',hideCash)}
+  if(cashModalConfirm){
+    cashModalConfirm.addEventListener('click',function(){
+      if(cashForm){
+        if(typeof cashForm.requestSubmit==='function'){cashForm.requestSubmit()}else{cashForm.submit()}
+        hideCash();
+      }else{hideCash()}
     });
   }
 });

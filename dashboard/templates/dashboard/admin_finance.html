@@ -8,7 +8,7 @@
     <div class="header-actions">
         <div>
             <h2>Financeiro</h2>
-            <p><a href="{% url 'logout' %}">Sair</a></p>
+            <p><a href="{% url 'logout' %}" class="btn-logout">Sair</a></p>
         </div>
         <button id="download-report" class="btn-primary">
             <i data-lucide="download"></i> Baixar Relatório
@@ -86,4 +86,3 @@
     <script src="{% static 'dashboard/js/finance_charts.js' %}"></script>
 </section>
 {% endblock %}
-
