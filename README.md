@@ -1,90 +1,108 @@
-# Barbearia Management System
+# Barber Shop Management System
 
-Sistema de gerenciamento para barbearias, desenvolvido em Django. Inclui agendamento online, dashboard administrativo, integração de pagamentos via Pix (AbacatePay) e lembretes automáticos via WhatsApp (Evolution API).
+Management system for barber shops, developed in Django. Includes online scheduling, administrative dashboard, payment integration via Pix (AbacatePay), and automatic reminders via WhatsApp (Evolution API).
 
-## 🚀 Funcionalidades
+## 🚀 Features
 
--   **Agendamento Online:** Interface para clientes agendarem horários, escolhendo barbeiro, serviço, data e hora.
--   **Dashboard Administrativo:** Painel para gerenciar agendamentos, visualizar histórico financeiro e métricas.
--   **Pagamentos Pix:** Geração de QR Code Pix via integração com AbacatePay.
--   **Lembretes WhatsApp:** Envio automático de lembretes de agendamento via Evolution API.
--   **Gestão de Usuários:** Controle de acesso e perfis de usuário.
+- **Online Scheduling:** Interface for clients to schedule appointments, choosing barber, service, date, and time.
 
-## 🛠 Tecnologias Utilizadas
+- **Administrative Dashboard:** Panel to manage appointments, view financial history and metrics.
 
--   **Backend:** Python 3, Django 5
--   **Banco de Dados:** SQLite (padrão), extensível para PostgreSQL
--   **Containerização:** Docker, Docker Compose
--   **Servidor Web:** Nginx, uWSGI
--   **Integrações:**
-    -   [Evolution API](https://github.com/EvolutionAPI/evolution-api) (WhatsApp)
-    -   [AbacatePay](https://abacatepay.com/) (Pagamentos Pix)
+- **Pix Payments:** Generation of Pix QR Code via integration with AbacatePay.
 
-## 📋 Pré-requisitos
+- **WhatsApp Reminders:** Automatic sending of appointment reminders via Evolution API.
 
--   [Docker](https://www.docker.com/)
--   [Docker Compose](https://docs.docker.com/compose/)
+- **User Management:** Access control and user profiles.
 
-## 🔧 Instalação e Execução
+## 🛠 Technologies Used
 
-1.  **Clone o repositório:**
+- **Backend:** Python 3, Django 5
+- **Database:** SQLite (default), extensible to PostgreSQL
+- **Containerization:** Docker, Docker Compose
+- **Web Server:** Nginx, uWSGI
+- **Integrations:**
 
-    ```bash
-    git clone https://github.com/seu-usuario/barbearia.git
-    cd barbearia
-    ```
+- [Evolution API](https://github.com/EvolutionAPI/evolution-api) (WhatsApp)
 
-2.  **Configure as variáveis de ambiente:**
+- [AbacatePay](https://abacatepay.com/) (Pix Payments)
 
-    Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+## 📋 Prerequisites
 
-    ```env
-    SECRET_KEY=sua_chave_secreta_django
-    DEBUG=True
-    
-    # Configurações de Token de Autoatendimento
-    SELF_SERVICE_TOKEN_KEY=seu_token_secreto
-    REQUIRE_SELF_SERVICE_TOKEN=False
-    
-    # Integração Evolution API (WhatsApp)
-    EVOLUTION_API_URL=http://evolution_api:8080
-    EVOLUTION_API_KEY=sua_chave_evolution_api
-    AUTHENTICATION_API_KEY=sua_chave_autenticacao
-    
-    # Integração AbacatePay
-    ABACATEPAY_KEY=sua_chave_api_abacatepay
-    ```
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
-3.  **Execute com Docker Compose:**
+## 🔧 Installation and Execution
 
-    ```bash
-    docker-compose up --build
-    ```
+1. **Clone the repository:**
 
-    O sistema iniciará os seguintes serviços:
-    -   `app`: Aplicação Django (porta 8000)
-    -   `nginx`: Servidor web (porta 80)
-    -   `evolution-api`: API de WhatsApp (porta 8082)
-    -   `reminder-worker`: Worker para envio de lembretes
+``bash
 
-4.  **Acesse a aplicação:**
+git clone https://github.com/your-username/barbershop.git
+cd barbershop
 
-    -   **Web:** http://localhost
-    -   **Admin Django:** http://localhost/admin
 
-## 🗂 Estrutura do Projeto
+2. **Configure the environment variables:**
 
--   `core/`: Configurações principais do projeto.
--   `scheduling/`: App de agendamento e gerenciamento de horários.
--   `dashboard/`: Painel administrativo personalizado.
--   `payments/`: Integração com gateway de pagamento.
--   `users/`: Gestão de usuários e autenticação.
--   `docker-compose.yml`: Orquestração dos containers.
+Create a `.env` file in the project root with the following variables:
 
-## 🤝 Contribuição
+``env
+SECRET_KEY=your_secret_django_key
+DEBUG=True
 
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou enviar pull requests.
+# Self-Service Token Settings
+SELF_SERVICE_TOKEN_KEY=your_secret_token
+REQUIRE_SELF_SERVICE_TOKEN=False
 
-## 📄 Licença
+# Evolution API Integration (WhatsApp)
+EVOLUTION_API_URL=http://evolution_api:8080
+EVOLUTION_API_KEY=your_evolution_api_key
+AUTHENTICATION_API_KEY=your_authentication_key
+
+# AbacatePay Integration
+ABACATEPAY_KEY=your_abacatepay_api_key
+```
+
+3. **Run with Docker Compose:**
+
+``bash
+docker-compose up --build
+
+```
+
+The system will start the following services:
+
+- `app`: Django application (port 8000)
+
+- `nginx`: Web server (port 80)
+
+- `evolution-api`: WhatsApp API (port 8082)
+
+- `reminder-worker`: Worker for sending reminders
+
+4. **Access the application:**
+
+- **Web:** http://localhost
+
+- **Django Admin:** http://localhost/admin
+
+## 🗂 Project Structure
+
+- `core/`: Main project configurations.
+
+- `scheduling/`: Scheduling and time management app.
+
+- `dashboard/`: Custom administrative panel.
+
+- `payments/`: Payment gateway integration.
+
+- `users/`: User management and authentication.
+
+- `docker-compose.yml`: Container orchestration.
+
+## 🤝 Contribution
+
+Contributions are welcome! Feel free to open issues or submit pull requests.
+
+## 📄 License
 
 [MIT](LICENSE)
