@@ -1,34 +1,24 @@
 from django.db import models
 from django.db.models import UniqueConstraint, Q
 
+from .choices import (
+    BARBER_CHOICES as APPOINTMENT_BARBER_CHOICES,
+    CANCELLED_BY_CHOICES as APPOINTMENT_CANCELLED_BY_CHOICES,
+    PAYMENT_CHOICES as APPOINTMENT_PAYMENT_CHOICES,
+    PAYMENT_METHOD_CHOICES as APPOINTMENT_PAYMENT_METHOD_CHOICES,
+    SERVICE_CHOICES as APPOINTMENT_SERVICE_CHOICES,
+    STATUS_CHOICES as APPOINTMENT_STATUS_CHOICES,
+)
+
 
 class Appointment(models.Model):
-    STATUS_CHOICES = [
-        ('ativo', 'Ativo'),
-        ('cancelado', 'Cancelado'),
-    ]
-    SERVICE_CHOICES = [
-        ('barba', 'Fazer a barba'),
-        ('cabelo', 'Cortar o cabelo'),
-        ('combo', 'Barba + cabelo'),
-    ]
-    BARBER_CHOICES = [
-        ('Japa', 'Japa'),
-    ]
-    PAYMENT_METHOD_CHOICES = [
-        ('pix', 'Pix'),
-        ('cash', 'Dinheiro'),
-    ]
-    PAYMENT_CHOICES = [
-        ('pendente', 'Pendente'),
-        ('pago', 'Pago'),
-        ('falhou', 'Falhou'),
-    ]
-    CANCELLED_BY_CHOICES = [
-        ('barber', 'Barbeiro'),
-        ('client', 'Cliente'),
-        ('system', 'Sistema'),
-    ]
+    STATUS_CHOICES = APPOINTMENT_STATUS_CHOICES
+    SERVICE_CHOICES = APPOINTMENT_SERVICE_CHOICES
+    BARBER_CHOICES = APPOINTMENT_BARBER_CHOICES
+    PAYMENT_METHOD_CHOICES = APPOINTMENT_PAYMENT_METHOD_CHOICES
+    PAYMENT_CHOICES = APPOINTMENT_PAYMENT_CHOICES
+    CANCELLED_BY_CHOICES = APPOINTMENT_CANCELLED_BY_CHOICES
+
     client_name = models.CharField(max_length=100)
     client_phone = models.CharField(max_length=16, blank=True, default='')
     service = models.CharField(max_length=10, choices=SERVICE_CHOICES)
