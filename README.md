@@ -1,5 +1,7 @@
 # Barber Shop Management System
 
+[English](README.md) | [Portugues](README.pt-BR.md)
+
 Management system for barber shops, developed in Django. Includes online scheduling, administrative dashboard, payment integration via Pix (AbacatePay), and automatic reminders via WhatsApp (Evolution API).
 
 ## Screenshots
