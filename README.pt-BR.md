@@ -1,6 +1,13 @@
 # Sistema de Gerenciamento para Barbearia
 
-[English](README.md) | [Portugues](README.pt-BR.md)
+<p align="center">
+  <a href="README.md">
+    <img src="https://img.shields.io/badge/English-0A66C2?style=for-the-badge&logo=readme&logoColor=white" alt="English README">
+  </a>
+  <a href="README.pt-BR.md">
+    <img src="https://img.shields.io/badge/Portugues-2E7D32?style=for-the-badge&logo=readme&logoColor=white" alt="README em Portugues">
+  </a>
+</p>
 
 Sistema de gerenciamento para barbearias, desenvolvido em Django. Inclui agendamento online, painel administrativo, integracao de pagamentos via Pix (AbacatePay) e lembretes automaticos via WhatsApp (Evolution API).
 
